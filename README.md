@@ -1,13 +1,13 @@
 # Kubernetes NiFi Cluster
 
-Apache NiFi supports powerful and scalable directed graphs of data routing, transformation, and system mediation logic.
+[Apache NiFi](https://nifi.apache.org/) supports powerful and scalable directed graphs of data routing, transformation, and system mediation logic.
 
 My goal is to show how to run Apache NiFi Cluster in Kubernetes
 
 ## Prerequisites
 
- - Kubernetes Cluster
- - Ingress Controller
+- Kubernetes Cluster
+- Ingress Controller
 
 ## Deployments
 
@@ -19,11 +19,13 @@ kubectl apply -f deployments/
 
 This will create:
 
- - 1x NiFi Namespace (all the items will be deployed here)
- - 3x Apache NiFi (each with it's own Service endpoint)
- - 1x Apache Zookeeper (accessible within the cluster only)
- - 1x Secrets (basic auth username/passowrd: `admin:admin`)
- - 1x Ingress (access endpoint)
+- 1x NiFi Namespace (all the items will be deployed here)
+- 3x Apache NiFi (each with it's own Service endpoint)
+- 1x Apache Zookeeper (accessible within the cluster only)
+- 1x Secrets (basic auth username/passowrd: `admin:admin`)
+- 1x Ingress (access endpoint)
+
+> Important: If this is exposed to public remeber to update `username/password`.
 
 ## Services
 
