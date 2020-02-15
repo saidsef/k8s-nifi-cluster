@@ -1,9 +1,11 @@
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: nifi
   namespace: nifi
+  labels:
+    app: nifi
   annotations:
     nginx.ingress.kubernetes.io/auth-type: basic
     nginx.ingress.kubernetes.io/auth-secret: nifi-basic-auth
@@ -17,5 +19,5 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: nifi-0
+          serviceName: nifi
           servicePort: 8080
