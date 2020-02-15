@@ -14,7 +14,7 @@ My goal is to show how to run Apache NiFi Cluster in Kubernetes
 This will deploy Apache NiFi in a Cluster mode with extenal Apache Zookeeper managing ellections:
 
 ```shell
-kubectl apply -f deployments/
+kubectl apply -k deployments/
 ```
 
 This will create:
@@ -25,7 +25,7 @@ This will create:
 - 1x Secrets (basic auth username/passowrd: `admin:admin`)
 - 1x Ingress (access endpoint)
 
-> Important: If this is exposed to public remeber to update `username/password`.
+> Important: If this is exposed to public remeber to update the default `username/password`.
 
 ## Services
 
