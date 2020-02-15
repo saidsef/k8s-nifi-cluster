@@ -1,0 +1,128 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nifi
+  namespace: nifi
+  labels:
+    name: nifi
+    app: nifi
+spec:
+  serviceName: nifi
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nifi
+  template:
+    metadata:
+      labels:
+        app: nifi
+    spec:
+      nodeSelector:
+        beta.kubernetes.io/os: linux
+        kubernetes.io/arch: amd64
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - topologyKey: "kubernetes.io/hostname"
+              labelSelector:
+                matchLabels:
+                  app: nifi
+      restartPolicy: Always
+      containers:
+      - name: nifi
+        image: apache/nifi:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          name: nifi
+        - containerPort: 8082
+          name: cluster
+        env:
+          - name: NIFI_WEB_HTTP_PORT
+            value: "8080"
+          - name: NIFI_CLUSTER_IS_NODE
+            value: "true"
+          - name: NIFI_CLUSTER_NODE_PROTOCOL_PORT
+            value: "8082"
+          - name: NIFI_CLUSTER_NODE_ADDRESS
+            value: "nifi"
+          - name: NIFI_ZK_CONNECT_STRING
+            value: "zookeeper:2181"
+          - name: NIFI_ELECTION_MAX_WAIT
+            value: "1 min"
+        livenessProbe:
+          exec:
+            command:
+              - pgrep
+              - java
+        readinessProbe:
+          tcpSocket:
+              port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        resources:
+          requests:
+            cpu: 200m
+            memory: 128Mi
+          limits:
+            cpu: 400m
+            memory: 512Gi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zookeeper
+  namespace: nifi
+  labels:
+    name: zookeeper
+    app: zookeeper
+spec:
+  serviceName: zookeeper
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zookeeper
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+    spec:
+      nodeSelector:
+        kubernetes.io/os: linux
+        kubernetes.io/arch: amd64
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - topologyKey: "kubernetes.io/hostname"
+              labelSelector:
+                matchLabels:
+                  app: zookeeper
+      restartPolicy: Always
+      containers:
+      - name: zookeeper
+        image: zookeeper:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 2181
+          name: zk
+        - containerPort: 5111
+          name: cmd
+        env:
+          - name: ALLOW_ANONYMOUS_LOGIN
+            value: "yes"
+        livenessProbe:
+          exec:
+            command:
+              - which
+              - java
+        readinessProbe:
+          tcpSocket:
+              port: 2181
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 512Mi
