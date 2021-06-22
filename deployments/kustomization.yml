@@ -9,7 +9,8 @@ commonAnnotations:
 resources:
 - namespace.yml
 - statefulset.yml
-- secret.yml
 - service.yml
+- hpa.yml
 # Set $(HOST) to a valid hostname before enabling ingress
+# - secret.yml
 # - ingress.yml
