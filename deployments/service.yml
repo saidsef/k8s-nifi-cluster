@@ -10,11 +10,7 @@ metadata:
     app.kubernetes.io/name: nifi
     app.kubernetes.io/part-of: nifi
 spec:
-  type: ClientIP
-  sessionAffinity: ClientIP
-  sessionAffinityConfig:
-    clientIP:
-      timeoutSeconds: 3000
+  type: ClusterIP
   selector:
     app: nifi
   ports:
@@ -37,11 +33,7 @@ metadata:
     app.kubernetes.io/name: zookeeper
     app.kubernetes.io/part-of: nifi
 spec:
-  type: ClientIP
-  # sessionAffinity: ClientIP
-  # sessionAffinityConfig:
-  #   clientIP:
-  #     timeoutSeconds: 3000
+  type: ClusterIP
   selector:
     app: zookeeper
   ports:
