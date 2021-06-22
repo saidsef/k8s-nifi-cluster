@@ -7,9 +7,12 @@ metadata:
   labels:
     name: nifi
     app: nifi
+  annotations:
+    app.kubernetes.io/name: nifi
+    app.kubernetes.io/part-of: nifi
 spec:
   serviceName: nifi
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: nifi
@@ -64,10 +67,10 @@ spec:
         resources:
           requests:
             cpu: 200m
-            memory: 128Mi
+            memory: 512Mi
           limits:
             cpu: 400m
-            memory: 512Gi
+            memory: 1Gi
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -77,6 +80,9 @@ metadata:
   labels:
     name: zookeeper
     app: zookeeper
+  annotations:
+    app.kubernetes.io/name: zookeeper
+    app.kubernetes.io/part-of: nifi
 spec:
   serviceName: zookeeper
   replicas: 1
@@ -111,6 +117,12 @@ spec:
         env:
           - name: ALLOW_ANONYMOUS_LOGIN
             value: "yes"
+          - name: ZOO_AUTOPURGE_PURGEINTERVAL
+            value: "1"
+          - name: ZOO_AUTOPURGE_SNAPRETAINCOUNT
+            value: "1"
+          - name: ZOO_STANDALONE_ENABLED
+            value: "true"
         livenessProbe:
           exec:
             command:
