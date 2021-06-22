@@ -25,12 +25,17 @@ spec:
         beta.kubernetes.io/os: linux
         kubernetes.io/arch: amd64
       affinity:
-        nodeAffinity:
+        podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-            - topologyKey: "kubernetes.io/hostname"
-              labelSelector:
-                matchLabels:
-                  app: nifi
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: "kubernetes.io/hostname"
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - nifi
       restartPolicy: Always
       containers:
       - name: nifi
@@ -101,12 +106,17 @@ spec:
         kubernetes.io/os: linux
         kubernetes.io/arch: amd64
       affinity:
-        nodeAffinity:
+        podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-            - topologyKey: "kubernetes.io/hostname"
-              labelSelector:
-                matchLabels:
-                  app: zookeeper
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: "kubernetes.io/hostname"
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - zookeeper
       restartPolicy: Always
       containers:
       - name: zookeeper
