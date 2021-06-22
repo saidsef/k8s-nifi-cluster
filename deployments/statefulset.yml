@@ -12,7 +12,7 @@ metadata:
     app.kubernetes.io/part-of: nifi
 spec:
   serviceName: nifi
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: nifi
@@ -59,6 +59,8 @@ spec:
             value: "zookeeper:2181"
           - name: NIFI_ELECTION_MAX_WAIT
             value: "1 min"
+          - name: NIFI_ELECTION_MAX_CANDIDATES
+            value: "1"
         livenessProbe:
           exec:
             command:
@@ -68,9 +70,9 @@ spec:
           tcpSocket:
               port: 8080
           initialDelaySeconds: 120
-          periodSeconds: 10
-          timeoutSeconds: 8
-          failureThreshold: 2
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
           successThreshold: 1
         resources:
           requests:
@@ -144,10 +146,10 @@ spec:
         readinessProbe:
           tcpSocket:
               port: 2181
-          initialDelaySeconds: 60
-          periodSeconds: 10
-          timeoutSeconds: 8
-          failureThreshold: 2
+          initialDelaySeconds: 120
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
           successThreshold: 1
         resources:
           requests:
