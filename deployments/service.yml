@@ -10,7 +10,8 @@ metadata:
     app.kubernetes.io/name: nifi
     app.kubernetes.io/part-of: nifi
 spec:
-  type: NodePort
+  type: ClusterIP
+  SessionAffinity: ClusterIP
   selector:
     app: nifi
   ports:
@@ -35,6 +36,7 @@ metadata:
     app.kubernetes.io/part-of: nifi
 spec:
   type: ClusterIP
+  SessionAffinity: ClusterIP
   selector:
     app: zookeeper
     "statefulset.kubernetes.io/pod-name": zookeeper-0

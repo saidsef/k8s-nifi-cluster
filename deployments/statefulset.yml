@@ -12,7 +12,7 @@ metadata:
     app.kubernetes.io/part-of: nifi
 spec:
   serviceName: nifi
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
       app: nifi
