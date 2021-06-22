@@ -53,7 +53,9 @@ spec:
           - name: NIFI_CLUSTER_NODE_PROTOCOL_PORT
             value: "8082"
           - name: NIFI_CLUSTER_NODE_ADDRESS
-            value: "nifi"
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
           - name: NIFI_ZK_CONNECT_STRING
             value: "zookeeper:2181"
           - name: NIFI_ELECTION_MAX_WAIT
