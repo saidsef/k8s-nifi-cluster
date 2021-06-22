@@ -56,8 +56,6 @@ spec:
             value: "zookeeper:2181"
           - name: NIFI_ELECTION_MAX_WAIT
             value: "1 min"
-          - name: NIFI_ELECTION_MAX_CANDIDATES
-            value: "1"
         livenessProbe:
           exec:
             command:
