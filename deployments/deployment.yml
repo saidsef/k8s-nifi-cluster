@@ -44,6 +44,8 @@ spec:
         - containerPort: 8082
           name: cluster
         env:
+          - name: NIFI_WEB_HTTP_HOST
+            value: "0.0.0.0"
           - name: NIFI_WEB_HTTP_PORT
             value: "8080"
           - name: NIFI_CLUSTER_IS_NODE
@@ -55,7 +57,11 @@ spec:
           - name: NIFI_ZK_CONNECT_STRING
             value: "zookeeper:2181"
           - name: NIFI_ELECTION_MAX_WAIT
-            value: "1 min"
+            value: "2 min"
+          - name: NIFI_JVM_HEAP_INIT
+            value: "2g"
+          - name: NIFI_JVM_HEAP_MAX
+            value: "2g"
         livenessProbe:
           exec:
             command:

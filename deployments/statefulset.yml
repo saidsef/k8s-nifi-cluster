@@ -43,11 +43,23 @@ spec:
         ports:
         - containerPort: 2181
           name: zk
+        - containerPort: 8080
+          name: web
         - containerPort: 5111
           name: cmd
         env:
           - name: ALLOW_ANONYMOUS_LOGIN
             value: "yes"
+          - name: ZOO_TICK_TIME
+            value: "4000"
+          - name: ZOO_INIT_LIMIT
+            value: "10"
+          - name: ZOO_SYNC_LIMIT
+            value: "6"
+          - name: ZOO_STANDALONE_ENABLED
+            value: "true"
+          - name: ZOO_ADMINSERVER_ENABLED
+            value: "true"
         livenessProbe:
           exec:
             command:

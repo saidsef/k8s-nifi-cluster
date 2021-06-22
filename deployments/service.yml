@@ -45,3 +45,7 @@ spec:
     port: 5111
     targetPort: 5111
     name: cmd
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+    name: web
