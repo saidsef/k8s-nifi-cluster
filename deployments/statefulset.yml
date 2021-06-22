@@ -62,7 +62,7 @@ spec:
             value: "true"
           - name: ZOO_AUTOPURGE_PURGEINTERVAL
             value: "2"
-          - naame: ZOO_AUTOPURGE_SNAPRETAINCOUNT
+          - name: ZOO_AUTOPURGE_SNAPRETAINCOUNT
             value: "10"
         livenessProbe:
           exec:
