@@ -6,6 +6,9 @@ metadata:
   namespace: nifi
   labels:
     app: nifi
+  annotations:
+    app.kubernetes.io/name: nifi
+    app.kubernetes.io/part-of: nifi
 spec:
   type: NodePort
   selector:
@@ -27,6 +30,9 @@ metadata:
   namespace: nifi
   labels:
     app: zookeeper
+  annotations:
+    app.kubernetes.io/name: zookeeper
+    app.kubernetes.io/part-of: nifi
 spec:
   type: ClusterIP
   selector:
