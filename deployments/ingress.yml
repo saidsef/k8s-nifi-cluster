@@ -1,5 +1,5 @@
 ---
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: nifi
@@ -7,6 +7,8 @@ metadata:
   labels:
     app: nifi
   annotations:
+    app.kubernetes.io/name: nifi
+    app.kubernetes.io/part-of: nifi
     nginx.ingress.kubernetes.io/auth-type: basic
     nginx.ingress.kubernetes.io/auth-secret: nifi-basic-auth
     nginx.ingress.kubernetes.io/auth-realm: "Authentication Required"
@@ -14,10 +16,13 @@ metadata:
       server_tokens off;
 spec:
   rules:
-  - host: nifi.saidsef.co.uk
+  - host: $(HOST)
     http:
       paths:
       - path: /
+        pathType: Prefix
         backend:
-          serviceName: nifi
-          servicePort: 8080
+          service:
+            name: nifi
+            port:
+              number: 8080
