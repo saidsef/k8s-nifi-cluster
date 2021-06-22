@@ -11,7 +11,10 @@ metadata:
     app.kubernetes.io/part-of: nifi
 spec:
   type: ClusterIP
-  SessionAffinity: ClusterIP
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10000
   selector:
     app: nifi
   ports:
@@ -36,7 +39,10 @@ metadata:
     app.kubernetes.io/part-of: nifi
 spec:
   type: ClusterIP
-  SessionAffinity: ClusterIP
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10000
   selector:
     app: zookeeper
     "statefulset.kubernetes.io/pod-name": zookeeper-0
