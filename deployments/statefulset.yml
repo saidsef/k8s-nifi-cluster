@@ -69,11 +69,11 @@ spec:
           successThreshold: 1
         resources:
           requests:
-            cpu: 200m
-            memory: 512Mi
+            cpu: 300m
+            memory: 1Gi
           limits:
             cpu: 400m
-            memory: 1Gi
+            memory: 2Gi
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -141,8 +141,8 @@ spec:
           successThreshold: 1
         resources:
           requests:
-            cpu: 100m
-            memory: 512Mi
-          limits:
-            cpu: 200m
+            cpu: 300m
             memory: 1Gi
+          limits:
+            cpu: 400m
+            memory: 2G
