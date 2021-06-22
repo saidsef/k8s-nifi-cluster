@@ -9,4 +9,5 @@ resources:
 - statefulset.yml
 - secret.yml
 - service.yml
-- ingress.yml
+# Set $(HOST) to a valid hostname before enabling ingress
+# - ingress.yml
