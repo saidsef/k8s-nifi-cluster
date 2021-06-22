@@ -49,7 +49,7 @@ spec:
           - name: NIFI_WEB_HTTP_PORT
             value: "8080"
           - name: NIFI_CLUSTER_IS_NODE
-            value: "true"
+            value: "false"
           - name: NIFI_CLUSTER_NODE_PROTOCOL_PORT
             value: "8082"
           - name: NIFI_CLUSTER_NODE_ADDRESS
