@@ -9,6 +9,7 @@ commonAnnotations:
 resources:
 - namespace.yml
 - statefulset.yml
+- deployment.yml
 - service.yml
 - hpa.yml
 # Set $(HOST) to a valid hostname before enabling ingress
