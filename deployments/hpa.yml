@@ -10,6 +10,9 @@ spec:
     name: nifi
   minReplicas: 2
   maxReplicas: 8
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 300
   metrics:
     - type: Resource
       resource:
