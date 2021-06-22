@@ -48,12 +48,6 @@ spec:
         env:
           - name: ALLOW_ANONYMOUS_LOGIN
             value: "yes"
-          - name: ZOO_AUTOPURGE_PURGEINTERVAL
-            value: "1"
-          - name: ZOO_AUTOPURGE_SNAPRETAINCOUNT
-            value: "1"
-          - name: ZOO_STANDALONE_ENABLED
-            value: "true"
         livenessProbe:
           exec:
             command:
