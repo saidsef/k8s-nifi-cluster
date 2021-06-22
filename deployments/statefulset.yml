@@ -62,8 +62,11 @@ spec:
         readinessProbe:
           tcpSocket:
               port: 8080
-          initialDelaySeconds: 60
+          initialDelaySeconds: 120
           periodSeconds: 10
+          timeoutSeconds: 8
+          failureThreshold: 2
+          successThreshold: 1
         resources:
           requests:
             cpu: 200m
@@ -131,10 +134,15 @@ spec:
         readinessProbe:
           tcpSocket:
               port: 2181
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 8
+          failureThreshold: 2
+          successThreshold: 1
         resources:
           requests:
             cpu: 100m
-            memory: 128Mi
+            memory: 512Mi
           limits:
             cpu: 200m
-            memory: 512Mi
+            memory: 1Gi
