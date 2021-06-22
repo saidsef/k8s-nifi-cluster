@@ -3,7 +3,6 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: nifi
-  namespace: nifi
   labels:
     name: nifi
     app: nifi
@@ -86,7 +85,6 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: zookeeper
-  namespace: nifi
   labels:
     name: zookeeper
     app: zookeeper

@@ -3,7 +3,6 @@ apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
   name: nifi
-  namespace: nifi
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
