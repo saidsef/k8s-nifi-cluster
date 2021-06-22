@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/name: nifi
     app.kubernetes.io/part-of: nifi
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app: nifi
   ports:
@@ -33,7 +33,7 @@ metadata:
     app.kubernetes.io/name: zookeeper
     app.kubernetes.io/part-of: nifi
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app: zookeeper
   ports:
