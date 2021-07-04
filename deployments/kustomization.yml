@@ -3,11 +3,15 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 namespace: nifi
+commonAnnotations:
+  app.kubernetes.io/deployed-by: kustomization
 
 resources:
 - namespace.yml
 - statefulset.yml
-- secret.yml
+- deployment.yml
 - service.yml
+- hpa.yml
 # Set $(HOST) to a valid hostname before enabling ingress
+# - secret.yml
 # - ingress.yml

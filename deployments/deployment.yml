@@ -1,27 +1,25 @@
 ---
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
-  name: zookeeper
+  name: nifi
   labels:
-    name: zookeeper
-    app: zookeeper
+    name: nifi
+    app: nifi
   annotations:
-    app.kubernetes.io/name: zookeeper
+    app.kubernetes.io/name: nifi
     app.kubernetes.io/part-of: nifi
 spec:
-  serviceName: zookeeper
-  replicas: 1
   selector:
     matchLabels:
-      app: zookeeper
+      app: nifi
   template:
     metadata:
       labels:
-        app: zookeeper
+        app: nifi
     spec:
       nodeSelector:
-        kubernetes.io/os: linux
+        beta.kubernetes.io/os: linux
         kubernetes.io/arch: amd64
       affinity:
         podAntiAffinity:
@@ -34,44 +32,46 @@ spec:
                   - key: app
                     operator: In
                     values:
-                    - zookeeper
+                    - nifi
       restartPolicy: Always
       containers:
-      - name: zookeeper
-        image: zookeeper:latest
+      - name: nifi
+        image: apache/nifi:latest
         imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 2181
-          name: zk
         - containerPort: 8080
-          name: web
-        - containerPort: 5111
-          name: cmd
+          name: nifi
+        - containerPort: 8082
+          name: cluster
         env:
-          - name: ALLOW_ANONYMOUS_LOGIN
-            value: "yes"
-          - name: ZOO_TICK_TIME
-            value: "4000"
-          - name: ZOO_INIT_LIMIT
-            value: "10"
-          - name: ZOO_SYNC_LIMIT
-            value: "6"
-          - name: ZOO_STANDALONE_ENABLED
+          - name: NIFI_WEB_HTTP_HOST
+            value: "0.0.0.0"
+          - name: NIFI_WEB_HTTP_PORT
+            value: "8080"
+          - name: NIFI_CLUSTER_IS_NODE
             value: "true"
-          - name: ZOO_ADMINSERVER_ENABLED
-            value: "true"
-          - name: ZOO_AUTOPURGE_PURGEINTERVAL
-            value: "2"
-          - name: ZOO_AUTOPURGE_SNAPRETAINCOUNT
-            value: "10"
+          - name: NIFI_CLUSTER_NODE_PROTOCOL_PORT
+            value: "8082"
+          - name: NIFI_CLUSTER_NODE_ADDRESS
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: NIFI_ZK_CONNECT_STRING
+            value: "zookeeper:2181"
+          - name: NIFI_ELECTION_MAX_WAIT
+            value: "2 min"
+          - name: NIFI_JVM_HEAP_INIT
+            value: "2g"
+          - name: NIFI_JVM_HEAP_MAX
+            value: "2g"
         livenessProbe:
           exec:
             command:
-              - which
+              - pgrep
               - java
         readinessProbe:
           tcpSocket:
-              port: 2181
+              port: 8080
           initialDelaySeconds: 120
           periodSeconds: 30
           timeoutSeconds: 10
@@ -80,7 +80,7 @@ spec:
         resources:
           requests:
             cpu: 300m
-            memory: 1Gi
+            memory: 2Gi
           limits:
             cpu: 400m
-            memory: 2G
+            memory: 4Gi
