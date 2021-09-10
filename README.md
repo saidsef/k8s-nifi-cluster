@@ -17,6 +17,8 @@ This will deploy Apache NiFi in a Cluster mode with extenal Apache Zookeeper man
 kubectl apply -k deployments/
 ```
 
+> *NOTE:* Remember to update Ingress hostname
+
 This will create:
 
 - 1x NiFi Namespace (all the items will be deployed here)
@@ -31,5 +33,11 @@ This will create:
 ## Services
 
 ```shell
-kubectl get all,ing --namespace nifi
+kubectl get all,ing
 ```
+
+## Contributing
+
+Feel free to contribute by making a [pull request](https://github.com/saidsef/k8s-nifi-cluster/pulls).
+
+Please read the official [Contribution Guide](./CONTRIBUTING.md) for more information on how you can contribute.
