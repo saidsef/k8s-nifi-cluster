@@ -21,6 +21,9 @@ images:
 - name: zookeeper
   newName: docker.io/zookeeper
   newTag: "3.7"
+- name: wait
+  newName: docker.io/busybox
+  newTag: "latest"
 
 vars:
 - fieldref: {}
