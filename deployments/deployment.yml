@@ -70,8 +70,8 @@ spec:
             value: "4g"
         volumeMounts:
           - name: flow-xml
-            mountPath: /opt/nifi/nifi-current/conf
-            subPath: conf
+            mountPath: /opt/nifi/nifi-current/conf/flow.xml.gz
+            subPath: flow.xml.gz
         livenessProbe:
           exec:
             command:
