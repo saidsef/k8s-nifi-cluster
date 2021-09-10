@@ -1,0 +1,34 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+commonAnnotations:
+  app.kubernetes.io/name: nifi
+  app.kubernetes.io/part-of: nifi
+  app.kubernetes.io/deployed-by: kustomization
+
+resources:
+- statefulset.yml
+- deployment.yml
+- service.yml
+- hpa.yml
+- ingress.yml
+
+images:
+- name: nifi
+  newName: docker.io/apache/nifi
+  newTag: "1.12.1"
+- name: zookeeper
+  newName: docker.io/zookeeper
+  newTag: "3.7"
+- name: wait
+  newName: docker.io/busybox
+  newTag: "latest"
+
+vars:
+- fieldref: {}
+  name: HOST
+  objref:
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    name: nifi

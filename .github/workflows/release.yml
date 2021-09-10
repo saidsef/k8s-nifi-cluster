@@ -1,0 +1,90 @@
+name: Release
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_run:
+    workflows:
+      - Tagging
+    types:
+      - completed
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - name: Fetch remote tags
+        run: git fetch origin +refs/tags/*:refs/tags/*
+      - name: Set Tag Value
+        run: |
+          export DATE=v$(echo `date +'%Y.%m'`)
+          echo "DATE=${DATE}" >> $GITHUB_ENV
+          echo "TAG=$(echo `git tag -l ${DATE}`)" >> $GITHUB_ENV
+      - name: Create Release
+        uses: actions/github-script@v4
+        id: release
+        if: ${{ env.TAG }}
+        with:
+          github-token: ${{ github.token }}
+          result-encoding: string
+          script: |
+            const { repo: { owner, repo }, sha } = context;
+            const tag = process.env.DATE;
+            let release_id = 0;
+
+            try {
+              const release = await github.repos.createRelease({
+                owner, repo,
+                tag_name: tag,
+                draft: false,
+                target_commitish: sha
+              });
+
+              release_id = release.data.id;
+            } catch (e) {
+              let latest;
+              if (e.status == 422) { // Release alredy exists
+                latest = await github.repos.getLatestRelease({
+                  owner, repo
+                });
+              }
+              release_id = latest.data.id;
+            }
+
+            return release_id
+
+      - name: Upload Release Assets
+        uses: actions/github-script@v4
+        if: ${{ steps.release.outputs.result }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const { repo: { owner, repo }, sha } = context;
+            const fs = require('fs').promises;
+
+            try {
+              let asset_ids = await github.repos.listReleaseAssets({
+                owner, repo,
+                release_id: ${{ steps.release.outputs.result }}
+              })
+              for (let asset of asset_ids.data) {
+                await github.repos.deleteReleaseAsset({
+                  owner, repo,
+                  asset_id: asset.id
+                });
+              }
+            } catch (e) {
+              console.log(e.status);
+            } finally {
+              for (let file of await fs.readdir('./deployment')) {
+                await github.repos.uploadReleaseAsset({
+                  owner, repo,
+                  release_id: ${{ steps.release.outputs.result }},
+                  name: file,
+                  data: await fs.readFile(`./deployment/${file}`)
+                })
+              }
+            }
