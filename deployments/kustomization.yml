@@ -2,16 +2,30 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: nifi
 commonAnnotations:
+  app.kubernetes.io/name: nifi
+  app.kubernetes.io/part-of: nifi
   app.kubernetes.io/deployed-by: kustomization
 
 resources:
-- namespace.yml
 - statefulset.yml
 - deployment.yml
 - service.yml
 - hpa.yml
-# Set $(HOST) to a valid hostname before enabling ingress
-# - secret.yml
-# - ingress.yml
+- ingress.yml
+
+images:
+- name: nifi
+  newName: docker.io/apache/nifi
+  newTag: "1.13.2"
+- name: zookeeper
+  newName: docker.io/zookeeper
+  newTag: "3.7"
+
+vars:
+- fieldref: {}
+  name: HOST
+  objref:
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    name: nifi
