@@ -6,11 +6,13 @@ on:
       - master
     paths:
       - ".github/workflows/docker.yml"
+      - "deployment/"
   pull_request:
     branches:
       - master
     paths:
       - ".github/workflows/docker.yml"
+      - "deployment/"
 
 jobs:
   k8s-test:
