@@ -71,7 +71,7 @@ spec:
           - name: NIFI_ZK_CONNECT_STRING
             value: "zookeeper:2181"
           - name: NIFI_ELECTION_MAX_WAIT
-            value: "10 sec"
+            value: "20 sec"
           - name: NIFI_JVM_HEAP_INIT
             value: "3g"
           - name: NIFI_JVM_HEAP_MAX
