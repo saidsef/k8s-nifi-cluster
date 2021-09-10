@@ -3,7 +3,6 @@ apiVersion: v1
 kind: Service
 metadata:
   name: nifi
-  namespace: nifi
   labels:
     app: nifi
   annotations:
