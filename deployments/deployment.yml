@@ -58,10 +58,10 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: status.podIP
+          - name: NIFI_ELECTION_MAX_CANDIDATES
+            value: "1"
           - name: NIFI_ZK_CONNECT_STRING
             value: "zookeeper:2181"
-          - name: NIFI_ZK_ROOT_NODE
-            value: "/nifi"
           - name: NIFI_ELECTION_MAX_WAIT
             value: "10 sec"
           - name: NIFI_JVM_HEAP_INIT
