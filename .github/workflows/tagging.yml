@@ -1,0 +1,49 @@
+name: Tagging
+on:
+  push:
+    branches:
+      - master
+  workflow_run:
+    workflows:
+      - CI
+    types:
+      - completed
+  workflow_dispatch:
+
+jobs:
+  tagging:
+    runs-on: ubuntu-latest
+    if: ${{ contains(github.ref, 'master') }}
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - name: Set Tag Value
+        run: |
+          echo "DATE=v$(echo `date +'%Y.%m'`)" >> $GITHUB_ENV
+      - name: Create Tag
+        uses: actions/github-script@v4
+        if: ${{ env.DATE }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            let tagExists = [];
+            try {
+              await github.git.createRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: "refs/tags/${{ env.DATE }}",
+                sha: context.sha
+              });
+            } catch (e) {
+              console.log("Tag already exists: " + e)
+              tagExists.push(e);
+            }
+
+            if (tagExists.length > 0) {
+              await github.git.updateRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: "tags/${{ env.DATE }}",
+                sha: context.sha
+              });
+            }
