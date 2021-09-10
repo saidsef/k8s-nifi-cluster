@@ -36,7 +36,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: nifi
-        image: apache/nifi:latest
+        image: docker.io/apache/nifi:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
@@ -52,23 +52,32 @@ spec:
             value: "true"
           - name: NIFI_CLUSTER_NODE_PROTOCOL_PORT
             value: "8082"
+          - name: NIFI_CLUSTER_NODE_PROTOCOL_MAX_THREADS
+            value: "20"
           - name: NIFI_CLUSTER_NODE_ADDRESS
             valueFrom:
               fieldRef:
                 fieldPath: status.podIP
           - name: NIFI_ZK_CONNECT_STRING
             value: "zookeeper:2181"
+          - name: NIFI_ZK_ROOT_NODE
+            value: "/nifi"
           - name: NIFI_ELECTION_MAX_WAIT
-            value: "2 min"
+            value: "1 min"
           - name: NIFI_JVM_HEAP_INIT
-            value: "2g"
+            value: "3g"
           - name: NIFI_JVM_HEAP_MAX
-            value: "2g"
+            value: "4g"
         livenessProbe:
           exec:
             command:
               - pgrep
               - java
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+          successThreshold: 1
         readinessProbe:
           tcpSocket:
               port: 8080
@@ -80,7 +89,18 @@ spec:
         resources:
           requests:
             cpu: 300m
-            memory: 2Gi
+            memory: 3Gi
           limits:
             cpu: 400m
             memory: 4Gi
+        securityContext:
+          allowPrivilegeEscalation: false
+          privileged: false
+          runAsGroup: 1000
+          runAsUser: 1000
+          capabilities:
+            drop:
+              - ALL
+            add:
+              - NET_BIND_SERVICE
+              - SYS_TIME
