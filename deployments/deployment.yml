@@ -36,7 +36,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: nifi
-        image: docker.io/apache/nifi:latest
+        image: docker.io/apache/nifi:1.13.2
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
