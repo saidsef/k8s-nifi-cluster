@@ -100,10 +100,10 @@ spec:
           successThreshold: 1
         resources:
           requests:
-            cpu: 300m
-            memory: 3Gi
-          limits:
             cpu: 400m
+            memory: 4Gi
+          limits:
+            cpu: 500m
             memory: 4Gi
         securityContext:
           allowPrivilegeEscalation: false
