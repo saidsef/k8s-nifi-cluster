@@ -38,7 +38,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: zookeeper
-        image: docker.io/zookeeper:latest
+        image: docker.io/zookeeper:3.7
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 2181
