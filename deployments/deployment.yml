@@ -60,6 +60,12 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: status.podIP
+          - name: HOSTNAME
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: NIFI_ANALYTICS_PREDICT_ENABLED
+            value: "true"
           - name: NIFI_ELECTION_MAX_CANDIDATES
             value: "1"
           - name: NIFI_ZK_CONNECT_STRING
