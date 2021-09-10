@@ -39,7 +39,7 @@ spec:
       initContainers:
         - name: wait
           image: docker.io/busybox:latest
-          commaand:
+          command:
           - sh
           - -c
           - |
