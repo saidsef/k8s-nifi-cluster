@@ -68,10 +68,10 @@ spec:
             value: "3g"
           - name: NIFI_JVM_HEAP_MAX
             value: "4g"
-        volumeMounts:
-          - name: flow-xml
-            mountPath: /opt/nifi/nifi-current/conf/flow.xml.gz
-            subPath: flow.xml.gz
+        # volumeMounts:
+        #   - name: flow-xml
+        #     mountPath: /opt/nifi/nifi-current/conf/flow.xml.gz
+        #     subPath: flow.xml.gz
         livenessProbe:
           exec:
             command:
