@@ -17,7 +17,7 @@ resources:
 images:
 - name: nifi
   newName: docker.io/apache/nifi
-  newTag: "1.12.1"
+  newTag: "1.13.2"
 - name: zookeeper
   newName: docker.io/zookeeper
   newTag: "3.7"
