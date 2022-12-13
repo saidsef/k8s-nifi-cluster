@@ -1,11 +1,10 @@
 name: Release
 on:
-  push:
-    tags:
-      - "v*"
   workflow_run:
     workflows:
       - Tagging
+    branches:
+      - main
     types:
       - completed
   workflow_dispatch:

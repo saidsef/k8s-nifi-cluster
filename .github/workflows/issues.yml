@@ -1,7 +1,7 @@
 name: New issues into Triage
 on:
   issues:
-    types: [opened, reopened]
+    types: [opened]
 
 jobs:
   comment:
