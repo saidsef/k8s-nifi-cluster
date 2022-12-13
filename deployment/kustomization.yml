@@ -7,10 +7,11 @@ commonAnnotations:
   app.kubernetes.io/deployed-by: kustomization
 
 resources:
-- statefulset.yml
-- deployment.yml
-- service.yml
-- hpa.yml
+- zookeeper.yml
+- nifi-deployment.yml
+- zookeeper-service.yml
+- nifi-service.yml
+- nifi-hpa.yml
 - ingress.yml
 
 images:
