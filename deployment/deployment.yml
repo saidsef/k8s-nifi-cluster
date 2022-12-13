@@ -46,11 +46,11 @@ spec:
             value: "zookeeper:2181"
           resources:
             requests:
-              cpu: 200m
-              memory: 500Mi
+              cpu: 100m
+              memory: 1Gi
             limits:
-              cpu: 200m
-              memory: 500Mi
+              cpu: 100m
+              memory: 1Gi
           securityContext:
             allowPrivilegeEscalation: false
             privileged: false
@@ -60,7 +60,7 @@ spec:
                 - ALL
       containers:
       - name: nifi
-        image: docker.io/apache/nifi:1.12.1
+        image: docker.io/apache/nifi:1.13.1
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
@@ -102,6 +102,7 @@ spec:
           - name: flow-xml
             mountPath: /opt/nifi/nifi-current/data
             subPath: data
+            readOnly: false
         livenessProbe:
           exec:
             command:
