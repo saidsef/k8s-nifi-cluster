@@ -10,6 +10,7 @@ metadata:
     app.kubernetes.io/name: nifi
     app.kubernetes.io/part-of: nifi
 spec:
+  revisionHistoryLimit: 1
   strategy:
     type: Recreate
   selector:
@@ -30,7 +31,7 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       initContainers:
-        - name: wait
+        - name: wait-for-zookeeper
           image: docker.io/busybox:1.35
           command:
           - sh
@@ -41,16 +42,17 @@ spec:
               echo "Waiting for zookeeper to start"
               sleep 3
             done
-          env:
-          - name: NIFI_ZK_CONNECT_STRING
-            value: "zookeeper:2181"
+          envFrom:
+          - configMapRef:
+              name: nifi-cm
+              optional: false
           resources:
             requests:
               cpu: 100m
-              memory: 1Gi
+              memory: 100Mi
             limits:
               cpu: 100m
-              memory: 1Gi
+              memory: 100Mi
           securityContext:
             allowPrivilegeEscalation: false
             privileged: false
@@ -60,7 +62,7 @@ spec:
                 - ALL
       containers:
       - name: nifi
-        image: docker.io/apache/nifi:1.15.3
+        image: docker.io/apache/nifi:1.19.1
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
@@ -68,16 +70,6 @@ spec:
         - containerPort: 8082
           name: cluster
         env:
-          - name: NIFI_WEB_HTTP_HOST
-            value: "0.0.0.0"
-          - name: NIFI_WEB_HTTP_PORT
-            value: "8080"
-          - name: NIFI_CLUSTER_IS_NODE
-            value: "true"
-          - name: NIFI_CLUSTER_NODE_PROTOCOL_PORT
-            value: "8082"
-          - name: NIFI_CLUSTER_NODE_PROTOCOL_MAX_THREADS
-            value: "20"
           - name: NIFI_CLUSTER_NODE_ADDRESS
             valueFrom:
               fieldRef:
@@ -86,18 +78,10 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: status.podIP
-          - name: NIFI_ANALYTICS_PREDICT_ENABLED
-            value: "true"
-          - name: NIFI_ELECTION_MAX_CANDIDATES
-            value: "2"
-          - name: NIFI_ZK_CONNECT_STRING
-            value: "zookeeper:2181"
-          - name: NIFI_ELECTION_MAX_WAIT
-            value: "20 sec"
-          - name: NIFI_JVM_HEAP_INIT
-            value: "2g"
-          - name: NIFI_JVM_HEAP_MAX
-            value: "2g"
+        envFrom:
+          - configMapRef:
+              name: nifi-cm
+              optional: false
         volumeMounts:
           - name: flow-xml
             mountPath: /opt/nifi/nifi-current/data

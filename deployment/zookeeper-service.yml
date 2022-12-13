@@ -18,6 +18,10 @@ spec:
     targetPort: 2181
     name: zk
   - protocol: TCP
+    port: 2182
+    targetPort: 2182
+    name: zc
+  - protocol: TCP
     port: 5111
     targetPort: 5111
     name: cmd

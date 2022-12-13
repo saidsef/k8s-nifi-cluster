@@ -10,8 +10,8 @@ metadata:
     app.kubernetes.io/name: zookeeper
     app.kubernetes.io/part-of: nifi
 spec:
+  revisionHistoryLimit: 1
   serviceName: zookeeper
-  replicas: 1
   selector:
     matchLabels:
       app: zookeeper
@@ -42,23 +42,10 @@ spec:
           name: web
         - containerPort: 5111
           name: cmd
-        env:
-          - name: ALLOW_ANONYMOUS_LOGIN
-            value: "yes"
-          - name: ZOO_TICK_TIME
-            value: "4000"
-          - name: ZOO_INIT_LIMIT
-            value: "10"
-          - name: ZOO_SYNC_LIMIT
-            value: "6"
-          - name: ZOO_STANDALONE_ENABLED
-            value: "true"
-          - name: ZOO_ADMINSERVER_ENABLED
-            value: "true"
-          - name: ZOO_AUTOPURGE_PURGEINTERVAL
-            value: "2"
-          - name: ZOO_AUTOPURGE_SNAPRETAINCOUNT
-            value: "10"
+        envFrom:
+          - configMapRef:
+              name: zookeeper-cm
+              optional: false
         livenessProbe:
           exec:
             command:

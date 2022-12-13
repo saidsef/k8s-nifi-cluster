@@ -7,6 +7,8 @@ commonAnnotations:
   app.kubernetes.io/deployed-by: kustomization
 
 resources:
+- zookeeper-configmap.yml
+- nifi-configmap.yml
 - zookeeper.yml
 - nifi-deployment.yml
 - zookeeper-service.yml
