@@ -1,11 +1,10 @@
 name: Release
 on:
-  push:
-    tags:
-      - "v*"
   workflow_run:
     workflows:
       - Tagging
+    branches:
+      - main
     types:
       - completed
   workflow_dispatch:
@@ -13,6 +12,7 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    if: ${{ contains(github.ref, 'main') }}
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2

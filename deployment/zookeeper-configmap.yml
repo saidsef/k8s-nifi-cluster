@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: zookeeper-cm
+data:
+  ALLOW_ANONYMOUS_LOGIN: "yes"
+  ZOO_ADMINSERVER_ENABLED: "true"
+  ZOO_AUTOPURGE_PURGEINTERVAL: "2"
+  ZOO_AUTOPURGE_SNAPRETAINCOUNT: "10"
+  ZOO_INIT_LIMIT: "10"
+  ZOO_STANDALONE_ENABLED: "true"
+  ZOO_SYNC_LIMIT: "6"
+  ZOO_TICK_TIME: "4000"

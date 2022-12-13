@@ -6,8 +6,7 @@ My goal is to show how to run Apache NiFi Cluster in Kubernetes
 
 ## Prerequisites
 
-- Kubernetes Cluster
-- Ingress Controller
+- Kubernetes Cluster >= v1.22
 
 ## Deployments
 
