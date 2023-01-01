@@ -19,12 +19,12 @@ spec:
     - type: Resource
       resource:
         name: memory
-        target: 
+        target:
           type: Utilization
           averageUtilization: 90
     - type: Resource
       resource:
         name: cpu
-        target: 
+        target:
           type: Utilization
           averageUtilization: 90
