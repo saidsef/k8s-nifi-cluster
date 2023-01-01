@@ -26,7 +26,7 @@ This will create:
 - 1x Secrets (basic auth username/passowrd: `admin:admin`)
 - 1x Ingress (access endpoint)
 
-> :information_source: Set `Ingress` hostname to valid hostname before enabling it in `kustomization.yml` 
+> :information_source: Set `Ingress` hostname to valid hostname before enabling it in `kustomization.yml`
 > Important: Remeber to update the default `username/password`.
 
 ## Services

@@ -7,14 +7,15 @@ commonAnnotations:
   app.kubernetes.io/deployed-by: kustomization
 
 resources:
-- zookeeper-configmap.yml
-- nifi-configmap.yml
-- zookeeper.yml
-- nifi-deployment.yml
-- zookeeper-service.yml
-- nifi-service.yml
-- nifi-hpa.yml
 - ingress.yml
+- nifi-configmap.yml
+- nifi-deployment.yml
+- nifi-hpa.yml
+- nifi-secrets.yml
+- nifi-service.yml
+- zookeeper-configmap.yml
+- zookeeper-service.yml
+- zookeeper.yml
 
 images:
 - name: nifi
