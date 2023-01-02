@@ -6,7 +6,7 @@ My goal is to show how to run Apache NiFi Cluster in Kubernetes
 
 ## Prerequisites
 
-- Kubernetes Cluster >= v1.22
+- Kubernetes Cluster >= v1.23
 
 ## Deployments
 
@@ -37,6 +37,11 @@ kubectl get all,ing
 
 ## Contributing
 
-Feel free to contribute by making a [pull request](https://github.com/saidsef/k8s-nifi-cluster/pulls).
+We would :heart: you to contribute by making a [pull request](https://github.com/saidsef/k8s-nifi-cluster/pulls).
 
 Please read the official [Contribution Guide](./CONTRIBUTING.md) for more information on how you can contribute.
+
+## Useful links:
+
+- [I Started NiFi. Now What?](https://nifi.apache.org/docs/nifi-docs/html/getting-started.html#i-started-nifi-now-what)
+- [NiFi System Administrator’s Guide](https://nifi.apache.org/docs/nifi-docs/html/administration-guide.html#build-a-custom-distribution)
