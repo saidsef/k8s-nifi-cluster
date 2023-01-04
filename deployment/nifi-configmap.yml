@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: nifi-cm
 data:
-  JAVA_OPTS: "--Xms2g -Xmx2g -XX:UseAVX=0"
+  JAVA_OPTS: "-XX:UseAVX=0"
   NIFI_ANALYTICS_PREDICT_ENABLED: "true"
   NIFI_CLUSTER_IS_NODE: "true"
   NIFI_CLUSTER_LOAD_BALANCE_HOST: "nifi"
