@@ -36,12 +36,17 @@ spec:
         ports:
         - containerPort: 2181
           name: zk
-        - containerPort: 2182
-          name: zc
         - containerPort: 8080
           name: web
-        - containerPort: 5111
-          name: cmd
+        - containerPort: 7070
+          name: metrics
+        env:
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: ZOO_SERVERS
+            value: "server.1=$(POD_IP):2888:3888;2181"
         envFrom:
           - configMapRef:
               name: zookeeper-cm
@@ -67,15 +72,28 @@ spec:
         resources:
           requests:
             cpu: 200m
-            memory: 1Gi
+            memory: 500Mi
           limits:
-            cpu: 300m
-            memory: 2Gi
+            cpu: 200m
+            memory: 500Mi
         securityContext:
           allowPrivilegeEscalation: false
           privileged: false
+          readOnlyRootFilesystem: true
           capabilities:
             drop:
               - ALL
-            add:
-              - NET_BIND_SERVICE
+        volumeMounts:
+          - mountPath: /data
+            name: data
+            subPath: data
+          - mountPath: /datalog
+            name: data
+            subPath: datalog
+          - mountPath: /conf
+            name: data
+            subPath: conf
+      volumes:
+        - name: data
+          emptyDir:
+            sizeLimit: 2Gi

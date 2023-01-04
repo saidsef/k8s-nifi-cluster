@@ -4,9 +4,10 @@ metadata:
   name: zookeeper-cm
 data:
   ALLOW_ANONYMOUS_LOGIN: "yes"
-  ZOO_ADMINSERVER_ENABLED: "true"
+  ZOO_ADMINSERVER_ENABLED: "false"
   ZOO_AUTOPURGE_PURGEINTERVAL: "2"
   ZOO_AUTOPURGE_SNAPRETAINCOUNT: "10"
+  ZOO_CFG_EXTRA: "metricsProvider.className=org.apache.zookeeper.metrics.prometheus.PrometheusMetricsProvider metricsProvider.httpPort=7070"
   ZOO_INIT_LIMIT: "10"
   ZOO_STANDALONE_ENABLED: "true"
   ZOO_SYNC_LIMIT: "6"
