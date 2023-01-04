@@ -18,6 +18,6 @@ spec:
     targetPort: 8080
     name: nifi
   - protocol: TCP
-    port: 8082
-    targetPort: 8082
+    port: 11443
+    targetPort: 11443
     name: cluster

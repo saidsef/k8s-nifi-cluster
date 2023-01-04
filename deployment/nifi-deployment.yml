@@ -67,9 +67,15 @@ spec:
         ports:
         - containerPort: 8080
           name: nifi
-        - containerPort: 8082
+        - containerPort: 11443
           name: cluster
+        - containerPort: 6342
+          name: cluster-lb
         env:
+          - name: NIFI_WEB_HTTP_HOST
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
           - name: NIFI_CLUSTER_NODE_ADDRESS
             valueFrom:
               fieldRef:
