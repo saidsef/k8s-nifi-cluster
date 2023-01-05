@@ -23,6 +23,7 @@ jobs:
           export DATE=v$(echo `date +'%Y.%m'`)
           echo "DATE=${DATE}" >> $GITHUB_ENV
           echo "TAG=$(echo `git tag -l ${DATE}`)" >> $GITHUB_ENV
+          echo "CHANGELOG=`git log --oneline $(git describe --tags @ --abbrev=0 @^ | head -n 1)..@ --pretty=format:"%h %an %s"`" >> $GITHUB_ENV
       - name: Create Release
         uses: actions/github-script@v6
         id: release
@@ -41,6 +42,7 @@ jobs:
                 tag_name: tag,
                 title: tag,
                 name: tag,
+                body: "${{ env.CHANGELOG }}",
                 draft: false,
                 make_latest: "true",
                 target_commitish: sha
