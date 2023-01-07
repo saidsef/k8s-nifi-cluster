@@ -37,7 +37,7 @@ spec:
         - containerPort: 2181
           name: zk
         - containerPort: 8080
-          name: web
+          name: http
         - containerPort: 7070
           name: metrics
         env:

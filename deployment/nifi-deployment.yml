@@ -66,9 +66,11 @@ spec:
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
-          name: nifi
+          name: http
         - containerPort: 11443
           name: cluster
+        - containerPort: 8443
+          name: https
         - containerPort: 6342
           name: cluster-lb
         env:
@@ -104,10 +106,8 @@ spec:
           failureThreshold: 3
           successThreshold: 1
         readinessProbe:
-          exec:
-            command:
-              - pgrep
-              - java
+          tcpSocket:
+            port: http
           initialDelaySeconds: 180
           periodSeconds: 30
           timeoutSeconds: 10
