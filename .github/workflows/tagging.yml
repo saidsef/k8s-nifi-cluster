@@ -20,7 +20,7 @@ jobs:
         run: |
           echo "DATE=v$(echo `date +'%Y.%m'`)" >> $GITHUB_ENV
       - name: Create Tag
-        uses: actions/github-script@v4
+        uses: actions/github-script@v6
         if: ${{ env.DATE }}
         with:
           github-token: ${{ github.token }}
