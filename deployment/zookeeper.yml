@@ -12,6 +12,7 @@ metadata:
 spec:
   revisionHistoryLimit: 1
   serviceName: zookeeper
+  podManagementPolicy: OrderedReady
   selector:
     matchLabels:
       app: zookeeper
@@ -37,7 +38,7 @@ spec:
         - containerPort: 2181
           name: zk
         - containerPort: 8080
-          name: web
+          name: http
         - containerPort: 7070
           name: metrics
         env:
@@ -63,8 +64,8 @@ spec:
           successThreshold: 1
         readinessProbe:
           tcpSocket:
-              port: 2181
-          initialDelaySeconds: 120
+              port: zk
+          initialDelaySeconds: 30
           periodSeconds: 30
           timeoutSeconds: 10
           failureThreshold: 3

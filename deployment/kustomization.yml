@@ -8,7 +8,8 @@ commonAnnotations:
 resources:
 - ingress.yml
 - nifi-configmap.yml
-- nifi-deployment.yml
+- nifi-ssl-configmap.yml
+- nifi.yml
 - nifi-hpa.yml
 - nifi-secrets.yml
 - nifi-service.yml

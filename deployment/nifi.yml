@@ -1,6 +1,6 @@
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: nifi
   labels:
@@ -11,8 +11,8 @@ metadata:
     app.kubernetes.io/part-of: nifi
 spec:
   revisionHistoryLimit: 1
-  strategy:
-    type: Recreate
+  serviceName: nifi
+  podManagementPolicy: OrderedReady
   selector:
     matchLabels:
       app: nifi
@@ -66,9 +66,11 @@ spec:
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
-          name: nifi
+          name: http
         - containerPort: 11443
           name: cluster
+        - containerPort: 8443
+          name: https
         - containerPort: 6342
           name: cluster-lb
         env:
@@ -89,26 +91,37 @@ spec:
               name: nifi-cm
               optional: false
         volumeMounts:
-          - name: flow-xml
+          - name: data
             mountPath: /opt/nifi/nifi-current/data
             subPath: data
             readOnly: false
+          - name: data
+            mountPath: /opt/nifi/nifi-current/keytool
+            subPath: keytool
+            readOnly: false
+          - name: scripts
+            mountPath: /scripts/security.sh
+            subPath: security.sh
+            readOnly: false
+        lifecycle:
+          postStart:
+            exec:
+              command:
+                - /scripts/security.sh
         livenessProbe:
           exec:
             command:
               - pgrep
               - java
-          initialDelaySeconds: 60
+          initialDelaySeconds: 30
           periodSeconds: 30
           timeoutSeconds: 10
           failureThreshold: 3
           successThreshold: 1
         readinessProbe:
-          exec:
-            command:
-              - pgrep
-              - java
-          initialDelaySeconds: 180
+          tcpSocket:
+            port: cluster
+          initialDelaySeconds: 30
           periodSeconds: 30
           timeoutSeconds: 10
           failureThreshold: 3
@@ -127,6 +140,11 @@ spec:
             drop:
               - ALL
       volumes:
-        - name: flow-xml
+        - name: data
           emptyDir:
             sizeLimit: 3Gi
+        - name: scripts
+          configMap:
+            name: nifi-ssl-cm
+            optional: false
+            defaultMode: 0755

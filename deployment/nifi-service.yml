@@ -14,9 +14,17 @@ spec:
     app: nifi
   ports:
   - protocol: TCP
+    port: 6342
+    targetPort: 6342
+    name: cluster-lb
+  - protocol: TCP
     port: 8080
     targetPort: 8080
-    name: nifi
+    name: http
+  - protocol: TCP
+    port: 8443
+    targetPort: 8443
+    name: https
   - protocol: TCP
     port: 11443
     targetPort: 11443
