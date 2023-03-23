@@ -32,7 +32,7 @@ spec:
           type: RuntimeDefault
       initContainers:
         - name: wait-for-zookeeper
-          image: docker.io/busybox:1.35
+          image: docker.io/busybox:1.36
           command:
           - sh
           - -c
@@ -113,7 +113,7 @@ spec:
             command:
               - pgrep
               - java
-          initialDelaySeconds: 30
+          initialDelaySeconds: 60
           periodSeconds: 30
           timeoutSeconds: 10
           failureThreshold: 3
@@ -129,10 +129,10 @@ spec:
         resources:
           requests:
             cpu: 400m
-            memory: 1Gi
+            memory: 2Gi
           limits:
             cpu: 400m
-            memory: 1Gi
+            memory: 2Gi
         securityContext:
           allowPrivilegeEscalation: false
           privileged: false

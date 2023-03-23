@@ -26,7 +26,7 @@ images:
   newTag: "3.8"
 - name: wait
   newName: docker.io/busybox
-  newTag: "1.35"
+  newTag: "1.36"
 
 vars:
 - fieldref: {}
