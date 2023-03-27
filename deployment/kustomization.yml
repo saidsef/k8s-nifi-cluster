@@ -20,13 +20,13 @@ resources:
 images:
 - name: nifi
   newName: docker.io/apache/nifi
-  newTag: "1.12.1"
+  newTag: "1.20.0"
 - name: zookeeper
   newName: docker.io/zookeeper
   newTag: "3.8"
 - name: wait
   newName: docker.io/busybox
-  newTag: "1.35"
+  newTag: "1.36"
 
 vars:
 - fieldref: {}

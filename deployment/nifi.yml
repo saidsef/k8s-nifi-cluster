@@ -32,7 +32,7 @@ spec:
           type: RuntimeDefault
       initContainers:
         - name: wait-for-zookeeper
-          image: docker.io/busybox:1.35
+          image: docker.io/busybox:1.36
           command:
           - sh
           - -c
@@ -62,7 +62,7 @@ spec:
                 - ALL
       containers:
       - name: nifi
-        image: docker.io/apache/nifi:1.19.1
+        image: docker.io/apache/nifi:1.20.0
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
@@ -82,10 +82,18 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: status.podIP
+          - name: NIFI_REMOTE_INPUT_HOST
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
           - name: HOSTNAME
             valueFrom:
               fieldRef:
                 fieldPath: status.podIP
+          - name: NODE_IDENTITY
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
         envFrom:
           - configMapRef:
               name: nifi-cm
@@ -113,7 +121,7 @@ spec:
             command:
               - pgrep
               - java
-          initialDelaySeconds: 30
+          initialDelaySeconds: 60
           periodSeconds: 30
           timeoutSeconds: 10
           failureThreshold: 3
@@ -129,10 +137,10 @@ spec:
         resources:
           requests:
             cpu: 400m
-            memory: 1Gi
+            memory: 2Gi
           limits:
             cpu: 400m
-            memory: 1Gi
+            memory: 2Gi
         securityContext:
           allowPrivilegeEscalation: false
           privileged: false
