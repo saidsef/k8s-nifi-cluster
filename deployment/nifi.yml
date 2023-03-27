@@ -82,10 +82,18 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: status.podIP
+          - name: NIFI_REMOTE_INPUT_HOST
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
           - name: HOSTNAME
             valueFrom:
               fieldRef:
                 fieldPath: status.podIP
+          - name: NODE_IDENTITY
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
         envFrom:
           - configMapRef:
               name: nifi-cm
