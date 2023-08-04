@@ -6,5 +6,11 @@ commonAnnotations:
   app.kubernetes.io/managed-by: kustomization
 
 resources:
-- nifi/
-- zookeeper/
+- configmap.yml
+- service.yml
+- zookeeper.yml
+
+images:
+- name: zookeeper
+  newName: docker.io/zookeeper
+  newTag: "3.8"
