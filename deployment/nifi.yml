@@ -23,6 +23,8 @@ spec:
     spec:
       automountServiceAccountToken: false
       enableServiceLinks: false
+      setHostnameAsFQDN: true
+      dnsPolicy: ClusterFirstWithHostNet
       restartPolicy: Always
       securityContext:
         runAsGroup: 1000
@@ -74,26 +76,32 @@ spec:
         - containerPort: 6342
           name: cluster-lb
         env:
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP # Use pod ip
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name # Use pod name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace # Use pod namespace
+          - name: NIFI_UI_BANNER_TEXT
+            value: $(POD_NAME) # Use pod name for banner
           - name: NIFI_WEB_HTTP_HOST
-            valueFrom:
-              fieldRef:
-                fieldPath: status.podIP
+            value: $(POD_NAME).nifi.$(POD_NAMESPACE).svc.cluster.local # Use pod fqdn as web host
           - name: NIFI_CLUSTER_NODE_ADDRESS
-            valueFrom:
-              fieldRef:
-                fieldPath: status.podIP
+            value: $(POD_NAME).nifi.$(POD_NAMESPACE).svc.cluster.local # Use pod fqdn as node address
+          - name: NIFI_REMOTE_INPUT_SOCKET_HOST
+            value: $(POD_NAME).nifi.$(POD_NAMESPACE).svc.cluster.local # Use pod fqdn as input socket address
           - name: NIFI_REMOTE_INPUT_HOST
-            valueFrom:
-              fieldRef:
-                fieldPath: status.podIP
+            value: $(POD_NAME).nifi.$(POD_NAMESPACE).svc.cluster.local # Use pod fqdn as input host address
           - name: HOSTNAME
-            valueFrom:
-              fieldRef:
-                fieldPath: status.podIP
+            value: $(POD_IP) # Use pod ip as hostname
           - name: NODE_IDENTITY
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.name
+            value: $(POD_NAME) # Use pod name as identity
         envFrom:
           - configMapRef:
               name: nifi-cm
