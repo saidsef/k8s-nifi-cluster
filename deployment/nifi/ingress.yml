@@ -15,7 +15,7 @@ metadata:
       server_tokens off;
 spec:
   rules:
-  - host: $(HOST)
+  - host: nifi
     http:
       paths:
       - path: /
