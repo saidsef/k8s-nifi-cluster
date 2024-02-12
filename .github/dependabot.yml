@@ -8,3 +8,9 @@ updates:
       - "saidsef"
     pull-request-branch-name:
       separator: "-"
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    pull-request-branch-name:
+      separator: "-"
