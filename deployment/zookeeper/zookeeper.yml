@@ -34,7 +34,7 @@ spec:
           type: RuntimeDefault
       containers:
       - name: zookeeper
-        image: docker.io/zookeeper:3.8
+        image: docker.io/zookeeper:3.9
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 2181
