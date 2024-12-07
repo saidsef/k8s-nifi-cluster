@@ -30,10 +30,6 @@ spec:
       - name: zookeeper
         imagePullPolicy: Always
         image: "registry.k8s.io/kubernetes-zookeeper:1.0-3.4.10"
-        resources:
-          requests:
-            memory: "1Gi"
-            cpu: "0.5"
         ports:
         - containerPort: 2181
           name: client
@@ -78,6 +74,20 @@ spec:
             - "zookeeper-ready 2181"
           initialDelaySeconds: 10
           timeoutSeconds: 5
+        resources:
+          requests:
+            cpu: 200m
+            memory: 500Mi
+          limits:
+            cpu: 200m
+            memory: 500Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          privileged: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
         volumeMounts:
         - name: data
           mountPath: /var/lib/zookeeper
