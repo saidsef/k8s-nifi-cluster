@@ -9,8 +9,4 @@ resources:
 - service-client.yml
 - service-server.yml
 - zookeeper.yml
-
-# images:
-# - name: zookeeper
-#   newName: docker.io/zookeeper
-#   newTag: "3.8"
+- pdb.yml
