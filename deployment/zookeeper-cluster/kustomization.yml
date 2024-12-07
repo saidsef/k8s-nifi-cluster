@@ -1,0 +1,16 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+commonAnnotations:
+  app.kubernetes.io/managed-by: kustomization
+
+resources:
+- service-client.yml
+- service-server.yml
+- zookeeper.yml
+
+# images:
+# - name: zookeeper
+#   newName: docker.io/zookeeper
+#   newTag: "3.8"
