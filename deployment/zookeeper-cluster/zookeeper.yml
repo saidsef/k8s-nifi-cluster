@@ -91,6 +91,10 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /var/lib/zookeeper
+          subPath: zookeeper
+        - name: data
+          mountPath: /opt/zookeeper/conf
+          subPath: conf
       securityContext:
         runAsUser: 1000
         fsGroup: 1000
