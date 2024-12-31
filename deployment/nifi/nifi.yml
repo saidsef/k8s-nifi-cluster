@@ -64,7 +64,7 @@ spec:
                 - ALL
       containers:
       - name: nifi
-        image: docker.io/apache/nifi:1.28.1
+        image: docker.io/apache/nifi:2.1.0
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
