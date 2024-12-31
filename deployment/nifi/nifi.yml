@@ -101,9 +101,11 @@ spec:
           - name: HOSTNAME
             value: $(POD_IP) # Use pod ip as hostname
           - name: NIFI_WEB_PROXY_HOST
-            value: $(POD_NAME).nifi.$(POD_NAMESPACE).svc.cluster.local # Use pod fqdn as proxy host
+            value: $(POD_NAME).nifi.$(POD_NAMESPACE).svc.cluster.local # Use pod fqdn as input host address
           - name: NODE_IDENTITY
             value: $(POD_NAME) # Use pod name as identity
+          - name: NIFI_CLUSTER_NODE_PROTOCOL_ADDRESS
+            value: $(POD_IP) # Use pod ip as hostname
         envFrom:
           - configMapRef:
               name: nifi-cm
@@ -139,7 +141,7 @@ spec:
         readinessProbe:
           tcpSocket:
             port: cluster
-          initialDelaySeconds: 60
+          initialDelaySeconds: 90
           periodSeconds: 30
           timeoutSeconds: 20
           failureThreshold: 3

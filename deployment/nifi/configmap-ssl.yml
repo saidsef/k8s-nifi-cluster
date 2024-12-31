@@ -9,7 +9,7 @@ data:
 
     ORGANISATION_UNIT=${ORGANISATION_UNIT:-'Cloud Services Application'}
     ORGANISATION=${ORGANISATION:-'Cloud Services'}
-    PUBLIC_DNS=${POD_NAME:-'nifi.tld'}
+    PUBLIC_DNS=${NIFI_CLUSTER_NODE_ADDRESS:-'nifi.tld'}
     CITY=${CITY:-'London'}
     STATE=${STATE:-'London'}
     COUNTRY_CODE=${COUNTRY_CODE:-'GB'}
@@ -17,20 +17,20 @@ data:
     KEYSTORE_PASS=${KEYSTORE_PASS:-$NIFI_SENSITIVE_PROPS_KEY}
     KEYSTORE_PASSWORD=${KEYSTORE_PASSWORD:-$NIFI_SENSITIVE_PROPS_KEY}
     KEYSTORE_PATH=${NIFI_HOME}/keytool/keystore.p12
-    KEYSTORE_TYPE=jks
+    KEYSTORE_TYPE=pkcs12
     TRUSTSTORE_PASS=${TRUSTSTORE_PASS:-$NIFI_SENSITIVE_PROPS_KEY}
     TRUSTSTORE_PASSWORD=${TRUSTSTORE_PASSWORD:-$NIFI_SENSITIVE_PROPS_KEY}
-    TRUSTSTORE_PATH=${NIFI_HOME}/keytool/truststore.jks
+    TRUSTSTORE_PATH=${NIFI_HOME}/keytool/truststore.p12
     TRUSTSTORE_TYPE=pkcs12
 
     if [[ ! -f "${NIFI_HOME}/keytool/keystore.p12" ]]
     then
       echo "Creating keystore"
       keytool -genkey -noprompt -alias nifi-keystore \
-      -dname "CN=${PUBLIC_DNS},OU=${ORGANISATION_UNIT},O=${ORGANISATION},L=${CITY},S=${STATE},C=${COUNTRY_CODE}" \
+      -dname "CN=${NIFI_CLUSTER_NODE_ADDRESS},OU=${ORGANISATION_UNIT},O=${ORGANISATION},L=${CITY},S=${STATE},C=${COUNTRY_CODE}" \
       -keystore ${NIFI_HOME}/keytool/keystore.p12 \
       -storepass ${KEYSTORE_PASS:-$NIFI_SENSITIVE_PROPS_KEY} \
-      -KeySize 2048 \
+      -keysize 2048 \
       -keypass "${KEY_PASS:-$NIFI_SENSITIVE_PROPS_KEY}" \
       -keyalg RSA \
       -storetype pkcs12
@@ -43,9 +43,9 @@ data:
       -rfc
     fi
 
-    if [[ ! -f "${NIFI_HOME}/keytool/truststore.jks" ]]
+    if [[ ! -f "${NIFI_HOME}/keytool/truststore.p12" ]]
     then
-      echo "Creating truststore"
+      echo "Import truststore"
       keytool -import -noprompt -alias nifi-truststore \
       -file "${NIFI_HOME}/keytool/nifi-cert.cer" \
       -keystore "${TRUSTSTORE_PATH}" \
