@@ -35,4 +35,4 @@ data:
   NIFI_ZOOKEEPER_CONNECT_STRING: "zookeeper:2181"
   TRUSTSTORE_PASSWORD: "th1s1s3up34e5r37"
   TRUSTSTORE_PATH: "${NIFI_HOME}/keytool/truststore.jks"
-  TRUSTSTORE_TYPE: "jks"
+  TRUSTSTORE_TYPE: "pkcs12"
