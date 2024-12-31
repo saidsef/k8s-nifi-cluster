@@ -100,6 +100,8 @@ spec:
             value: $(POD_NAME).nifi.$(POD_NAMESPACE).svc.cluster.local # Use pod fqdn as input host address
           - name: HOSTNAME
             value: $(POD_IP) # Use pod ip as hostname
+          - name: NIFI_WEB_PROXY_HOST
+            value: $(POD_NAME).nifi.$(POD_NAMESPACE).svc.cluster.local # Use pod fqdn as proxy host
           - name: NODE_IDENTITY
             value: $(POD_NAME) # Use pod name as identity
         envFrom:
