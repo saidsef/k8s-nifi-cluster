@@ -34,7 +34,7 @@ spec:
           type: RuntimeDefault
       initContainers:
         - name: wait-for-zookeeper
-          image: docker.io/busybox:1.36
+          image: docker.io/busybox:1.37
           command:
           - sh
           - -c
@@ -64,7 +64,7 @@ spec:
                 - ALL
       containers:
       - name: nifi
-        image: docker.io/apache/nifi:1.25.0
+        image: docker.io/apache/nifi:1.28.1
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
@@ -129,17 +129,17 @@ spec:
             command:
               - pgrep
               - java
-          initialDelaySeconds: 60
+          initialDelaySeconds: 120
           periodSeconds: 30
-          timeoutSeconds: 10
+          timeoutSeconds: 20
           failureThreshold: 3
           successThreshold: 1
         readinessProbe:
           tcpSocket:
             port: cluster
-          initialDelaySeconds: 30
+          initialDelaySeconds: 60
           periodSeconds: 30
-          timeoutSeconds: 10
+          timeoutSeconds: 20
           failureThreshold: 3
           successThreshold: 1
         resources:
