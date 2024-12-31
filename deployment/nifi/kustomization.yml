@@ -8,7 +8,7 @@ commonAnnotations:
 resources:
 - ingress.yml
 - configmap.yml
-- ssl-configmap.yml
+- configmap-ssl.yml
 - nifi.yml
 - hpa.yml
 - secrets.yml
@@ -17,7 +17,7 @@ resources:
 images:
 - name: nifi
   newName: docker.io/apache/nifi
-  newTag: "1.24.0"
+  newTag: "2.1.0"
 - name: wait
   newName: docker.io/busybox
-  newTag: "1.36"
+  newTag: "1.37"
