@@ -3,9 +3,8 @@ kind: ConfigMap
 metadata:
   name: nifi-cm
 data:
-  JAVA_OPTS: "-XX:UseAVX=0 -Djavax.net.debug=ssl,handshake"
+  JAVA_OPTS: "-XX:UseAVX=0 -Djavax.net.debug=ssl,handshake,address=8000"
   KEYSTORE_PASSWORD: "th1s1s3up34e5r37"
-  KEYSTORE_PATH: "${NIFI_HOME}/keytool/keystore.p12"
   KEYSTORE_TYPE: "PKCS12"
   NIFI_ANALYTICS_PREDICT_ENABLED: "true"
   NIFI_CLUSTER_IS_NODE: "true"
@@ -34,5 +33,4 @@ data:
   NIFI_ZK_CONNECT_STRING: "zookeeper:2181"
   NIFI_ZOOKEEPER_CONNECT_STRING: "zookeeper:2181"
   TRUSTSTORE_PASSWORD: "th1s1s3up34e5r37"
-  TRUSTSTORE_PATH: "${NIFI_HOME}/keytool/truststore.jks"
   TRUSTSTORE_TYPE: "pkcs12"
