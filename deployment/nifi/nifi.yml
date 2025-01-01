@@ -66,6 +66,13 @@ spec:
       - name: nifi
         image: docker.io/apache/nifi:2.1.0
         imagePullPolicy: IfNotPresent
+        command:
+          - /bin/sh
+          - -c
+          - |
+            echo "Starting NiFi"
+            /scripts/security.sh
+            /opt/nifi/scripts/start.sh
         ports:
         - containerPort: 8080
           name: http
@@ -88,6 +95,8 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace # Use pod namespace
+          - name: NIFI_LOAD_BALANCER
+            value: "nifi.$(POD_NAMESPACE).svc.cluster.local" # Use nifi service fqdn
           - name: NIFI_HOME
             value: "/opt/nifi/nifi-current"
           - name: NIFI_UI_BANNER_TEXT
@@ -104,8 +113,8 @@ spec:
             value: $(POD_NAME).nifi.$(POD_NAMESPACE).svc.cluster.local # Use pod fqdn as input host address
           - name: HOSTNAME
             value: $(POD_IP) # Use pod ip as hostname
-          - name: NIFI_WEB_PROXY_HOST
-            value: $(POD_NAME).nifi.$(POD_NAMESPACE).svc.cluster.local # Use pod fqdn as input host address
+          # - name: NIFI_WEB_PROXY_HOST
+          #   value: $(POD_NAME).nifi.$(POD_NAMESPACE).svc.cluster.local # Use pod fqdn as input host address
           - name: NODE_IDENTITY
             value: $(POD_NAME) # Use pod name as identity
           - name: NIFI_CLUSTER_NODE_PROTOCOL_ADDRESS
@@ -131,11 +140,11 @@ spec:
             mountPath: /scripts/security.sh
             subPath: security.sh
             readOnly: false
-        lifecycle:
-          postStart:
-            exec:
-              command:
-                - /scripts/security.sh
+        # lifecycle:
+        #   postStart:
+        #     exec:
+        #       command:
+        #         - /scripts/security.sh
         livenessProbe:
           exec:
             command:
@@ -149,7 +158,7 @@ spec:
         readinessProbe:
           tcpSocket:
             port: cluster
-          initialDelaySeconds: 90
+          initialDelaySeconds: 200
           periodSeconds: 30
           timeoutSeconds: 20
           failureThreshold: 3
