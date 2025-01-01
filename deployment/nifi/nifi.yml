@@ -88,6 +88,8 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace # Use pod namespace
+          - name: NIFI_LOAD_BALANCER
+            value: "nifi.$(POD_NAMESPACE).svc.cluster.local" # Use nifi service fqdn
           - name: NIFI_HOME
             value: "/opt/nifi/nifi-current"
           - name: NIFI_UI_BANNER_TEXT
@@ -104,8 +106,8 @@ spec:
             value: $(POD_NAME).nifi.$(POD_NAMESPACE).svc.cluster.local # Use pod fqdn as input host address
           - name: HOSTNAME
             value: $(POD_IP) # Use pod ip as hostname
-          - name: NIFI_WEB_PROXY_HOST
-            value: $(POD_NAME).nifi.$(POD_NAMESPACE).svc.cluster.local # Use pod fqdn as input host address
+          # - name: NIFI_WEB_PROXY_HOST
+          #   value: $(POD_NAME).nifi.$(POD_NAMESPACE).svc.cluster.local # Use pod fqdn as input host address
           - name: NODE_IDENTITY
             value: $(POD_NAME) # Use pod name as identity
           - name: NIFI_CLUSTER_NODE_PROTOCOL_ADDRESS

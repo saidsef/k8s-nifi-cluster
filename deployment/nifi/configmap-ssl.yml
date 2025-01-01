@@ -13,12 +13,12 @@ data:
     CITY=${CITY:-'London'}
     STATE=${STATE:-'London'}
     COUNTRY_CODE=${COUNTRY_CODE:-'GB'}
-    KEY_PASS=${KEY_PASS:-$KEYSTORE_PASS}
+    KEY_PASS=${NIFI_SENSITIVE_PROPS_KEY:-$KEYSTORE_PASS}
     KEYSTORE_PASS=${KEYSTORE_PASS:-$NIFI_SENSITIVE_PROPS_KEY}
     KEYSTORE_PASSWORD=${KEYSTORE_PASSWORD:-$NIFI_SENSITIVE_PROPS_KEY}
     KEYSTORE_PATH=${NIFI_HOME}/keytool/keystore.p12
     KEYSTORE_TYPE=pkcs12
-    TRUSTSTORE_PASS=${TRUSTSTORE_PASS:-$NIFI_SENSITIVE_PROPS_KEY}
+    TRUSTSTORE_PASS=${TRUSTSTORE_PASSWORD:-$NIFI_SENSITIVE_PROPS_KEY}
     TRUSTSTORE_PASSWORD=${TRUSTSTORE_PASSWORD:-$NIFI_SENSITIVE_PROPS_KEY}
     TRUSTSTORE_PATH=${NIFI_HOME}/keytool/truststore.p12
     TRUSTSTORE_TYPE=pkcs12
@@ -33,6 +33,7 @@ data:
       -keysize 2048 \
       -keypass "${KEY_PASS:-$NIFI_SENSITIVE_PROPS_KEY}" \
       -keyalg RSA \
+      -ext "SAN=dns:localhost,dns:${NIFI_CLUSTER_NODE_ADDRESS},dns:${NIFI_LOAD_BALANCER},dns:${PUBLIC_DNS},ip:${POD_IP},ip:127.0.0.1,dns:${NIFI_WEB_HTTP_HOST},dns:${POD_NAME},dns:${NODE_IDENTITY}" \
       -storetype pkcs12
 
       echo "Exporting the self-signed certificate from the keystore"
@@ -45,7 +46,7 @@ data:
 
     if [[ ! -f "${NIFI_HOME}/keytool/truststore.p12" ]]
     then
-      echo "Import truststore"
+      echo "Importing truststore"
       keytool -import -noprompt -alias nifi-truststore \
       -file "${NIFI_HOME}/keytool/nifi-cert.cer" \
       -keystore "${TRUSTSTORE_PATH}" \
@@ -55,4 +56,4 @@ data:
     fi
 
     #/usr/bin/bash ${NIFI_HOME}/../scripts/secure.sh 
-    #eval ${NIFI_HOME}/../scripts/secure.sh 
+    # eval ${NIFI_HOME}/../scripts/secure.sh
