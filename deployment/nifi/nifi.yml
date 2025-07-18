@@ -64,15 +64,8 @@ spec:
                 - ALL
       containers:
       - name: nifi
-        image: docker.io/apache/nifi:2.1.0
+        image: docker.io/apache/nifi:1.28.1
         imagePullPolicy: IfNotPresent
-        command:
-          - /bin/sh
-          - -c
-          - |
-            echo "Starting NiFi"
-            /scripts/security.sh
-            /opt/nifi/scripts/start.sh
         ports:
         - containerPort: 8080
           name: http
@@ -95,16 +88,12 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace # Use pod namespace
-          - name: NIFI_LOAD_BALANCER
-            value: "nifi.$(POD_NAMESPACE).svc.cluster.local" # Use nifi service fqdn
-          - name: NIFI_HOME
-            value: "/opt/nifi/nifi-current"
           - name: NIFI_UI_BANNER_TEXT
             value: $(POD_NAME) # Use pod name for banner
-          - name: NIFI_WEB_HTTP_HOST
-            value: $(POD_NAME).nifi.$(POD_NAMESPACE).svc.cluster.local # Use pod fqdn as web host
-          - name: NIFI_WEB_HTTPS_HOST
-            value: $(POD_NAME).nifi.$(POD_NAMESPACE).svc.cluster.local # Use pod fqdn as web host
+          - name: NIFI_CLUSTER_LOAD_BALANCE_HOST
+            value: $(POD_NAME).nifi.$(POD_NAMESPACE).svc.cluster.local # Use pod fqdn as load balance host
+          # - name: NIFI_WEB_HTTP_HOST
+          #   value: $(POD_NAME).nifi.$(POD_NAMESPACE).svc.cluster.local # Use pod fqdn as web host
           - name: NIFI_CLUSTER_NODE_ADDRESS
             value: $(POD_NAME).nifi.$(POD_NAMESPACE).svc.cluster.local # Use pod fqdn as node address
           - name: NIFI_REMOTE_INPUT_SOCKET_HOST
@@ -113,16 +102,8 @@ spec:
             value: $(POD_NAME).nifi.$(POD_NAMESPACE).svc.cluster.local # Use pod fqdn as input host address
           - name: HOSTNAME
             value: $(POD_IP) # Use pod ip as hostname
-          # - name: NIFI_WEB_PROXY_HOST
-          #   value: $(POD_NAME).nifi.$(POD_NAMESPACE).svc.cluster.local # Use pod fqdn as input host address
           - name: NODE_IDENTITY
             value: $(POD_NAME) # Use pod name as identity
-          - name: NIFI_CLUSTER_NODE_PROTOCOL_ADDRESS
-            value: $(POD_IP) # Use pod ip as hostname
-          - name: KEYSTORE_PATH
-            value: "$(NIFI_HOME)/keytool/keystore.p12"
-          - name: TRUSTSTORE_PATH
-            value: "$(NIFI_HOME)/keytool/truststore.p12"
         envFrom:
           - configMapRef:
               name: nifi-cm
