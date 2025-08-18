@@ -23,7 +23,7 @@ jobs:
       - name: Create k8s Kind Cluster
         uses: helm/kind-action@v1.12.0
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Run K8s test
         run: |
           kubectl cluster-info
