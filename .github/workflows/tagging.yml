@@ -15,7 +15,7 @@ jobs:
     if: ${{ contains(github.ref, 'main') }}
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Set Tag Value
         run: |
           echo "DATE=v$(echo `date +'%Y.%m'`)" >> $GITHUB_ENV
