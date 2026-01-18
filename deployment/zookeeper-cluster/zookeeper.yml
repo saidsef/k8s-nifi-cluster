@@ -29,7 +29,7 @@ spec:
       containers:
       - name: zookeeper
         imagePullPolicy: Always
-        image: "registry.k8s.io/kubernetes-zookeeper:1.0-3.4.10"
+        image: "docker.io/apache/nifi:2.1.0"
         ports:
         - containerPort: 2181
           name: client
