@@ -22,17 +22,15 @@ jobs:
     steps:
       - name: Create k8s Kind Cluster
         uses: helm/kind-action@v1.13.0
+        with:
+          kubectl_version: v1.33.7
+          node_image: kindest/node:v1.33.7
       - name: Checkout
         uses: actions/checkout@v6
       - name: Run K8s test
         run: |
-          kubectl cluster-info
-          export NS=`cat deployment/kustomization.yml  | grep namespace | awk '{ print $2 }'`
-          if [ -z "$NS" ]; then
-            export NS='nifi'
-          fi
-          kubectl create namespace $NS
-          kubectl apply -n $NS -k deployment/
+          kubectl create namespace nifi
+          kubectl apply -n nifi -k deployment/
           kubectl get all -A
 
   auto-approve:
