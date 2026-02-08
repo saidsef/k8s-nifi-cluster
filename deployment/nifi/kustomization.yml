@@ -13,11 +13,13 @@ resources:
 - hpa.yml
 - secrets.yml
 - service.yml
+- sa.yml
+- rbac.yml
 
 images:
 - name: nifi
   newName: docker.io/apache/nifi
-  newTag: "2.1.0"
+  newTag: "2.7.2"
 - name: wait
   newName: docker.io/busybox
   newTag: "1.37"

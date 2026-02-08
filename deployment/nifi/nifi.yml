@@ -21,7 +21,8 @@ spec:
       labels:
         app: nifi
     spec:
-      automountServiceAccountToken: false
+      serviceAccountName: nifi
+      automountServiceAccountToken: true
       enableServiceLinks: false
       setHostnameAsFQDN: true
       dnsPolicy: ClusterFirstWithHostNet
@@ -64,7 +65,7 @@ spec:
                 - ALL
       containers:
       - name: nifi
-        image: docker.io/apache/nifi:1.28.1
+        image: docker.io/apache/nifi:2.7.2
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
@@ -121,11 +122,11 @@ spec:
             mountPath: /scripts/security.sh
             subPath: security.sh
             readOnly: false
-        # lifecycle:
-        #   postStart:
-        #     exec:
-        #       command:
-        #         - /scripts/security.sh
+        lifecycle:
+          postStart:
+            exec:
+              command:
+                - /scripts/security.sh
         livenessProbe:
           exec:
             command:

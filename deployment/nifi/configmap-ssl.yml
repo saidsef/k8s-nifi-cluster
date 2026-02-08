@@ -7,33 +7,42 @@ data:
     #!/bin/bash
     set -ex -o allexport
 
+    NIFI_HOME=${NIFI_HOME:-/opt/nifi/nifi-current}
     ORGANISATION_UNIT=${ORGANISATION_UNIT:-'Cloud Services Application'}
     ORGANISATION=${ORGANISATION:-'Cloud Services'}
     PUBLIC_DNS=${NIFI_CLUSTER_NODE_ADDRESS:-'nifi.tld'}
     CITY=${CITY:-'London'}
     STATE=${STATE:-'London'}
     COUNTRY_CODE=${COUNTRY_CODE:-'GB'}
-    KEY_PASS=${NIFI_SENSITIVE_PROPS_KEY:-$KEYSTORE_PASS}
     KEYSTORE_PASS=${KEYSTORE_PASS:-$NIFI_SENSITIVE_PROPS_KEY}
-    KEYSTORE_PASSWORD=${KEYSTORE_PASSWORD:-$NIFI_SENSITIVE_PROPS_KEY}
+    KEY_PASS=${KEY_PASS:-$KEYSTORE_PASS}
     KEYSTORE_PATH=${NIFI_HOME}/keytool/keystore.p12
     KEYSTORE_TYPE=pkcs12
-    TRUSTSTORE_PASS=${TRUSTSTORE_PASSWORD:-$NIFI_SENSITIVE_PROPS_KEY}
-    TRUSTSTORE_PASSWORD=${TRUSTSTORE_PASSWORD:-$NIFI_SENSITIVE_PROPS_KEY}
+    TRUSTSTORE_PASS=${TRUSTSTORE_PASS:-$NIFI_SENSITIVE_PROPS_KEY}
     TRUSTSTORE_PATH=${NIFI_HOME}/keytool/truststore.p12
     TRUSTSTORE_TYPE=pkcs12
 
-    if [[ ! -f "${NIFI_HOME}/keytool/keystore.p12" ]]
+    if [[ ! -f "${KEYSTORE_PATH}" ]]
     then
       echo "Creating keystore"
+      
+      # Build SAN string carefully to avoid empty entries
+      SAN="ip:${POD_IP},dns:localhost,ip:127.0.0.1"
+      if [[ -n "${NIFI_CLUSTER_NODE_ADDRESS}" ]]; then SAN="${SAN},dns:${NIFI_CLUSTER_NODE_ADDRESS}"; fi
+      if [[ -n "${NIFI_LOAD_BALANCER}" ]]; then SAN="${SAN},dns:${NIFI_LOAD_BALANCER}"; fi
+      if [[ -n "${PUBLIC_DNS}" ]]; then SAN="${SAN},dns:${PUBLIC_DNS}"; fi
+      if [[ -n "${NIFI_WEB_HTTP_HOST}" ]]; then SAN="${SAN},dns:${NIFI_WEB_HTTP_HOST}"; fi
+      if [[ -n "${POD_NAME}" ]]; then SAN="${SAN},dns:${POD_NAME}"; fi
+      if [[ -n "${NODE_IDENTITY}" ]]; then SAN="${SAN},dns:${NODE_IDENTITY}"; fi
+
       keytool -genkey -noprompt -alias nifi-keystore \
       -dname "CN=${NIFI_CLUSTER_NODE_ADDRESS},OU=${ORGANISATION_UNIT},O=${ORGANISATION},L=${CITY},S=${STATE},C=${COUNTRY_CODE}" \
-      -keystore ${KEYSTORE_PATH} \
-      -storepass "${KEYSTORE_PASS:-$NIFI_SENSITIVE_PROPS_KEY}" \
+      -keystore "${KEYSTORE_PATH}" \
+      -storepass "${KEYSTORE_PASS}" \
       -keysize 2048 \
-      -keypass "${KEY_PASS:-$NIFI_SENSITIVE_PROPS_KEY}" \
+      -keypass "${KEY_PASS}" \
       -keyalg RSA \
-      -ext "SAN=ip:${POD_IP},dns:localhost,dns:${NIFI_CLUSTER_NODE_ADDRESS},dns:${NIFI_LOAD_BALANCER},dns:${PUBLIC_DNS},ip:127.0.0.1,dns:${NIFI_WEB_HTTP_HOST},dns:${POD_NAME},dns:${NODE_IDENTITY}" \
+      -ext "SAN=${SAN}" \
       -storetype pkcs12
 
       echo "Exporting the self-signed certificate from the keystore"
@@ -45,13 +54,8 @@ data:
       -rfc
     fi
 
-    if [[ ! -f "${NIFI_HOME}/keytool/truststore.p12" ]]
+    if [[ ! -f "${TRUSTSTORE_PATH}" ]]
     then
-      echo "Delete if truststore exists"
-      keytool -delete -alias nifi-truststore \
-      -keystore "${TRUSTSTORE_PATH}" \
-      -storepass "${TRUSTSTORE_PASS}" 2>/dev/null || true
-
       echo "Importing truststore"
       keytool -import -noprompt -alias nifi-truststore \
       -file "${NIFI_HOME}/keytool/nifi-cert.cer" \
@@ -60,6 +64,3 @@ data:
       -storepass "${TRUSTSTORE_PASS}" \
       -trustcacerts
     fi
-
-    #/usr/bin/bash ${NIFI_HOME}/../scripts/secure.sh 
-    # eval ${NIFI_HOME}/../scripts/secure.sh
