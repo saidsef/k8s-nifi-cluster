@@ -30,10 +30,32 @@ spec:
       securityContext:
         runAsGroup: 1000
         runAsUser: 1000
-        runAsNonRoot: true
+        fsGroup: 1000
         seccompProfile:
           type: RuntimeDefault
       initContainers:
+        - name: fix-permissions
+          image: docker.io/busybox:1.37
+          command:
+          - sh
+          - -c
+          - |
+            chmod -R 777 /certs
+            chown -R 1000:1000 /certs
+          volumeMounts:
+          - name: certs
+            mountPath: /certs
+          securityContext:
+            runAsUser: 0
+            runAsNonRoot: false
+            allowPrivilegeEscalation: false
+            privileged: false
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - CHOWN
+                - FOWNER
         - name: wait-for-zookeeper
           image: docker.io/busybox:1.37
           command:
@@ -168,12 +190,7 @@ spec:
             subPath: data
             readOnly: false
           - name: certs
-            mountPath: /opt/nifi/nifi-current/conf/keystore.p12
-            subPath: keystore.p12
-            readOnly: false
-          - name: certs
-            mountPath: /opt/nifi/nifi-current/conf/truststore.p12
-            subPath: truststore.p12
+            mountPath: /opt/nifi/nifi-current/conf/certs
             readOnly: false
           - name: scripts
             mountPath: /scripts/security.sh

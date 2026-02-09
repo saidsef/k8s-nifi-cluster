@@ -15,6 +15,7 @@ resources:
 - service.yml
 - sa.yml
 - rbac.yml
+- pv-certs.yml
 - pvc-certs.yml
 
 images:
