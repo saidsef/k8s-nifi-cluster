@@ -102,7 +102,12 @@ spec:
             sed -i 's|nifi.security.keystorePasswd=.*|nifi.security.keystorePasswd=th1s1s3up34e5r37|' /opt/nifi/nifi-current/conf/nifi.properties
             sed -i 's|nifi.security.truststorePasswd=.*|nifi.security.truststorePasswd=th1s1s3up34e5r37|' /opt/nifi/nifi-current/conf/nifi.properties
             sed -i 's|nifi.security.keyPasswd=.*|nifi.security.keyPasswd=th1s1s3up34e5r37|' /opt/nifi/nifi-current/conf/nifi.properties
-            sed -i 's|nifi.web.https.sni.host.check=.*|nifi.web.https.sni.host.check=false|' /opt/nifi/nifi-current/conf/nifi.properties || echo "nifi.web.https.sni.host.check=false" >> /opt/nifi/nifi-current/conf/nifi.properties
+            if grep -q "nifi.web.https.sni.host.check" /opt/nifi/nifi-current/conf/nifi.properties; then
+              sed -i 's|nifi.web.https.sni.host.check=.*|nifi.web.https.sni.host.check=false|' /opt/nifi/nifi-current/conf/nifi.properties
+            else
+              echo "nifi.web.https.sni.host.check=false" >> /opt/nifi/nifi-current/conf/nifi.properties
+            fi
+            sed -i 's|nifi.web.proxy.host=.*|nifi.web.proxy.host=|' /opt/nifi/nifi-current/conf/nifi.properties
             
             # Start NiFi
             /opt/nifi/scripts/start.sh
