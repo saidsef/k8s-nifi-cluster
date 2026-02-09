@@ -109,6 +109,9 @@ spec:
             fi
             sed -i 's|nifi.web.proxy.host=.*|nifi.web.proxy.host=|' /opt/nifi/nifi-current/conf/nifi.properties
             
+            # Set credentials
+            /opt/nifi/nifi-current/bin/nifi.sh set-single-user-credentials "${NIFI_SINGLE_USER_CREDENTIALS_USERNAME}" "${NIFI_SINGLE_USER_CREDENTIALS_PASSWORD}"
+
             # Start NiFi
             /opt/nifi/scripts/start.sh
         ports:
