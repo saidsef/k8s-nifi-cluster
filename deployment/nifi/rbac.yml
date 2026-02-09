@@ -9,8 +9,8 @@ metadata:
     app.kubernetes.io/part-of: nifi
 rules:
   - apiGroups: [""]
-    resources: ["configmaps"]
-    verbs: ["get", "list", "watch"]
+    resources: ["configmaps", "secrets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
   - apiGroups: ["coordination.k8s.io"]
     resources: ["leases"]
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]

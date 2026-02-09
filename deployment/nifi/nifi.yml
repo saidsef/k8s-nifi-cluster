@@ -63,10 +63,49 @@ spec:
             capabilities:
               drop:
                 - ALL
+        - name: security-setup
+          image: docker.io/apache/nifi:2.7.2
+          command:
+          - /bin/bash
+          - /scripts/security.sh
+          env:
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          envFrom:
+          - configMapRef:
+              name: nifi-cm
+              optional: false
+          volumeMounts:
+          - name: certs
+            mountPath: /certs
+          - name: scripts
+            mountPath: /scripts/security.sh
+            subPath: security.sh
       containers:
       - name: nifi
         image: docker.io/apache/nifi:2.7.2
         imagePullPolicy: IfNotPresent
+        command:
+          - /bin/bash
+          - -c
+          - |
+            echo "Applying custom configuration..."
+            # Ensure paths and passwords are set correctly in nifi.properties
+            sed -i 's|nifi.security.keystore=.*|nifi.security.keystore=./conf/keystore.p12|' /opt/nifi/nifi-current/conf/nifi.properties
+            sed -i 's|nifi.security.truststore=.*|nifi.security.truststore=./conf/truststore.p12|' /opt/nifi/nifi-current/conf/nifi.properties
+            sed -i 's|nifi.security.keystorePasswd=.*|nifi.security.keystorePasswd=th1s1s3up34e5r37|' /opt/nifi/nifi-current/conf/nifi.properties
+            sed -i 's|nifi.security.truststorePasswd=.*|nifi.security.truststorePasswd=th1s1s3up34e5r37|' /opt/nifi/nifi-current/conf/nifi.properties
+            sed -i 's|nifi.security.keyPasswd=.*|nifi.security.keyPasswd=th1s1s3up34e5r37|' /opt/nifi/nifi-current/conf/nifi.properties
+            sed -i 's|nifi.web.https.sni.host.check=.*|nifi.web.https.sni.host.check=false|' /opt/nifi/nifi-current/conf/nifi.properties || echo "nifi.web.https.sni.host.check=false" >> /opt/nifi/nifi-current/conf/nifi.properties
+            
+            # Start NiFi
+            /opt/nifi/scripts/start.sh
         ports:
         - containerPort: 8080
           name: http
@@ -105,6 +144,12 @@ spec:
             value: $(POD_IP) # Use pod ip as hostname
           - name: NODE_IDENTITY
             value: $(POD_NAME) # Use pod name as identity
+          - name: NIFI_SECURITY_KEYSTORE_PASSWD
+            value: "th1s1s3up34e5r37"
+          - name: NIFI_SECURITY_TRUSTSTORE_PASSWD
+            value: "th1s1s3up34e5r37"
+          - name: NIFI_SECURITY_KEY_PASSWD
+            value: "th1s1s3up34e5r37"
         envFrom:
           - configMapRef:
               name: nifi-cm
@@ -114,19 +159,18 @@ spec:
             mountPath: /opt/nifi/nifi-current/data
             subPath: data
             readOnly: false
-          - name: data
-            mountPath: /opt/nifi/nifi-current/keytool
-            subPath: keytool
+          - name: certs
+            mountPath: /opt/nifi/nifi-current/conf/keystore.p12
+            subPath: keystore.p12
+            readOnly: false
+          - name: certs
+            mountPath: /opt/nifi/nifi-current/conf/truststore.p12
+            subPath: truststore.p12
             readOnly: false
           - name: scripts
             mountPath: /scripts/security.sh
             subPath: security.sh
             readOnly: false
-        lifecycle:
-          postStart:
-            exec:
-              command:
-                - /scripts/security.sh
         livenessProbe:
           exec:
             command:
@@ -162,6 +206,9 @@ spec:
         - name: data
           emptyDir:
             sizeLimit: 3Gi
+        - name: certs
+          persistentVolumeClaim:
+            claimName: nifi-shared-certs
         - name: scripts
           configMap:
             name: nifi-ssl-cm
