@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nifi-ssl-cm
+data:
+  security.sh: |
+    #!/bin/bash
+    set -ex -o allexport
+
+    CERTS_DIR="/certs"
+    KEYSTORE_PATH="${CERTS_DIR}/keystore.p12"
+    TRUSTSTORE_PATH="${CERTS_DIR}/truststore.p12"
+
+    if [[ ! -f "${KEYSTORE_PATH}" ]]; then
+        echo "Generating cluster-wide certificates in shared volume..."
+        
+        ORGANISATION_UNIT=${ORGANISATION_UNIT:-'Cloud Services Application'}
+        ORGANISATION=${ORGANISATION:-'Cloud Services'}
+        CITY=${CITY:-'London'}
+        STATE=${STATE:-'London'}
+        COUNTRY_CODE=${COUNTRY_CODE:-'GB'}
+        KEYSTORE_PASS="th1s1s3up34e5r37"
+        TRUSTSTORE_PASS="th1s1s3up34e5r37"
+
+        SAN="dns:localhost,ip:127.0.0.1,dns:nifi,dns:*.nifi.nifi.svc.cluster.local"
+        if [[ -n "${POD_IP}" ]]; then SAN="${SAN},ip:${POD_IP}"; fi
+
+        keytool -genkey -noprompt -alias nifi-keystore \
+        -dname "CN=nifi,OU=${ORGANISATION_UNIT},O=${ORGANISATION},L=${CITY},S=${STATE},C=${COUNTRY_CODE}" \
+        -keystore "${KEYSTORE_PATH}" \
+        -storepass "${KEYSTORE_PASS}" \
+        -keysize 2048 \
+        -keypass "${KEYSTORE_PASS}" \
+        -keyalg RSA \
+        -ext "SAN=${SAN}" \
+        -ext "basicConstraints=CA:true" \
+        -storetype pkcs12
+
+        keytool -export -alias nifi-keystore \
+        -keystore "${KEYSTORE_PATH}" \
+        -storepass "${KEYSTORE_PASS}" \
+        -file "${CERTS_DIR}/nifi-cert.cer" \
+        -storetype pkcs12 \
+        -rfc
+
+        keytool -import -noprompt -alias nifi-truststore \
+        -file "${CERTS_DIR}/nifi-cert.cer" \
+        -keystore "${TRUSTSTORE_PATH}" \
+        -storetype pkcs12 \
+        -storepass "${TRUSTSTORE_PASS}" \
+        -trustcacerts
+    else
+        echo "Shared certificates found."
+    fi

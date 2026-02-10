@@ -21,7 +21,8 @@ spec:
       labels:
         app: nifi
     spec:
-      automountServiceAccountToken: false
+      serviceAccountName: nifi
+      automountServiceAccountToken: true
       enableServiceLinks: false
       setHostnameAsFQDN: true
       dnsPolicy: ClusterFirstWithHostNet
@@ -29,10 +30,32 @@ spec:
       securityContext:
         runAsGroup: 1000
         runAsUser: 1000
-        runAsNonRoot: true
+        fsGroup: 1000
         seccompProfile:
           type: RuntimeDefault
       initContainers:
+        - name: fix-permissions
+          image: docker.io/busybox:1.37
+          command:
+          - sh
+          - -c
+          - |
+            chmod -R 777 /certs
+            chown -R 1000:1000 /certs
+          volumeMounts:
+          - name: certs
+            mountPath: /certs
+          securityContext:
+            runAsUser: 0
+            runAsNonRoot: false
+            allowPrivilegeEscalation: false
+            privileged: false
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - CHOWN
+                - FOWNER
         - name: wait-for-zookeeper
           image: docker.io/busybox:1.37
           command:
@@ -62,10 +85,57 @@ spec:
             capabilities:
               drop:
                 - ALL
+        - name: security-setup
+          image: docker.io/apache/nifi:2.7.2
+          command:
+          - /bin/bash
+          - /scripts/security.sh
+          env:
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          envFrom:
+          - configMapRef:
+              name: nifi-cm
+              optional: false
+          volumeMounts:
+          - name: certs
+            mountPath: /certs
+          - name: scripts
+            mountPath: /scripts/security.sh
+            subPath: security.sh
       containers:
       - name: nifi
-        image: docker.io/apache/nifi:1.28.1
+        image: docker.io/apache/nifi:2.7.2
         imagePullPolicy: IfNotPresent
+        command:
+          - /bin/bash
+          - -c
+          - |
+            echo "Applying custom configuration..."
+            # Ensure paths and passwords are set correctly in nifi.properties
+            sed -i 's|nifi.security.keystore=.*|nifi.security.keystore=./conf/keystore.p12|' /opt/nifi/nifi-current/conf/nifi.properties
+            sed -i 's|nifi.security.truststore=.*|nifi.security.truststore=./conf/truststore.p12|' /opt/nifi/nifi-current/conf/nifi.properties
+            sed -i 's|nifi.security.keystorePasswd=.*|nifi.security.keystorePasswd=th1s1s3up34e5r37|' /opt/nifi/nifi-current/conf/nifi.properties
+            sed -i 's|nifi.security.truststorePasswd=.*|nifi.security.truststorePasswd=th1s1s3up34e5r37|' /opt/nifi/nifi-current/conf/nifi.properties
+            sed -i 's|nifi.security.keyPasswd=.*|nifi.security.keyPasswd=th1s1s3up34e5r37|' /opt/nifi/nifi-current/conf/nifi.properties
+            if grep -q "nifi.web.https.sni.host.check" /opt/nifi/nifi-current/conf/nifi.properties; then
+              sed -i 's|nifi.web.https.sni.host.check=.*|nifi.web.https.sni.host.check=false|' /opt/nifi/nifi-current/conf/nifi.properties
+            else
+              echo "nifi.web.https.sni.host.check=false" >> /opt/nifi/nifi-current/conf/nifi.properties
+            fi
+            sed -i 's|nifi.web.proxy.host=.*|nifi.web.proxy.host=|' /opt/nifi/nifi-current/conf/nifi.properties
+            
+            # Set credentials
+            /opt/nifi/nifi-current/bin/nifi.sh set-single-user-credentials "${NIFI_SINGLE_USER_CREDENTIALS_USERNAME}" "${NIFI_SINGLE_USER_CREDENTIALS_PASSWORD}"
+
+            # Start NiFi
+            /opt/nifi/scripts/start.sh
         ports:
         - containerPort: 8080
           name: http
@@ -90,8 +160,10 @@ spec:
                 fieldPath: metadata.namespace # Use pod namespace
           - name: NIFI_UI_BANNER_TEXT
             value: $(POD_NAME) # Use pod name for banner
-          - name: NIFI_WEB_HTTP_HOST
-            value: $(POD_NAME).nifi.$(POD_NAMESPACE).svc.cluster.local # Use pod fqdn as web host
+          - name: NIFI_CLUSTER_LOAD_BALANCE_HOST
+            value: $(POD_NAME).nifi.$(POD_NAMESPACE).svc.cluster.local # Use pod fqdn as load balance host
+          # - name: NIFI_WEB_HTTP_HOST
+          #   value: $(POD_NAME).nifi.$(POD_NAMESPACE).svc.cluster.local # Use pod fqdn as web host
           - name: NIFI_CLUSTER_NODE_ADDRESS
             value: $(POD_NAME).nifi.$(POD_NAMESPACE).svc.cluster.local # Use pod fqdn as node address
           - name: NIFI_REMOTE_INPUT_SOCKET_HOST
@@ -102,6 +174,12 @@ spec:
             value: $(POD_IP) # Use pod ip as hostname
           - name: NODE_IDENTITY
             value: $(POD_NAME) # Use pod name as identity
+          - name: NIFI_SECURITY_KEYSTORE_PASSWD
+            value: "th1s1s3up34e5r37"
+          - name: NIFI_SECURITY_TRUSTSTORE_PASSWD
+            value: "th1s1s3up34e5r37"
+          - name: NIFI_SECURITY_KEY_PASSWD
+            value: "th1s1s3up34e5r37"
         envFrom:
           - configMapRef:
               name: nifi-cm
@@ -111,19 +189,13 @@ spec:
             mountPath: /opt/nifi/nifi-current/data
             subPath: data
             readOnly: false
-          - name: data
-            mountPath: /opt/nifi/nifi-current/keytool
-            subPath: keytool
+          - name: certs
+            mountPath: /opt/nifi/nifi-current/conf/certs
             readOnly: false
           - name: scripts
             mountPath: /scripts/security.sh
             subPath: security.sh
             readOnly: false
-        lifecycle:
-          postStart:
-            exec:
-              command:
-                - /scripts/security.sh
         livenessProbe:
           exec:
             command:
@@ -137,7 +209,7 @@ spec:
         readinessProbe:
           tcpSocket:
             port: cluster
-          initialDelaySeconds: 60
+          initialDelaySeconds: 200
           periodSeconds: 30
           timeoutSeconds: 20
           failureThreshold: 3
@@ -159,6 +231,9 @@ spec:
         - name: data
           emptyDir:
             sizeLimit: 3Gi
+        - name: certs
+          persistentVolumeClaim:
+            claimName: nifi-shared-certs
         - name: scripts
           configMap:
             name: nifi-ssl-cm

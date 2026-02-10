@@ -13,4 +13,4 @@ resources:
 images:
 - name: zookeeper
   newName: docker.io/zookeeper
-  newTag: "3.8"
+  newTag: "3.9"
