@@ -18,10 +18,6 @@ spec:
     targetPort: 6342
     name: cluster-lb
   - protocol: TCP
-    port: 8080
-    targetPort: 8080
-    name: http
-  - protocol: TCP
     port: 8443
     targetPort: 8443
     name: https

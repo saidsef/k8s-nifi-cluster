@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nifi-authorizers-cm
+data:
+  authorizers.xml: |
+    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+    <authorizers>
+        <authorizer>
+            <identifier>single-user-authorizer</identifier>
+            <class>org.apache.nifi.authorization.single.user.SingleUserAuthorizer</class>
+        </authorizer>
+    </authorizers>
