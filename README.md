@@ -36,7 +36,7 @@ kubectl port-forward svc/nifi 8443:8443 -n nifi  # fallback without ingress
 
 Then open: [http://nifi/nifi](http://nifi/nifi)
 
-NiFi handles its own authentication — log in with the single-user credentials configured in `configmap.yml`.
+NiFi handles its own authentication - log in with the single-user credentials configured in `configmap.yml`.
 
 ### Default Credentials
 
