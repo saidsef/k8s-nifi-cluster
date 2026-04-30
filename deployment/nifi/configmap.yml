@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: nifi-cm
 data:
-  NIFI_JVM_HEAP_INIT: "2g"
+  NIFI_JVM_HEAP_INIT: "512m"
   NIFI_JVM_HEAP_MAX: "2g"
 
   NIFI_WEB_HTTPS_PORT: "8443"
