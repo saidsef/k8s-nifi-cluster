@@ -5,14 +5,14 @@ metadata:
   name: nifi
   labels:
     app: nifi
-  annotations:
     app.kubernetes.io/name: nifi
     app.kubernetes.io/part-of: nifi
+  annotations:
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     nginx.ingress.kubernetes.io/affinity: "cookie"
     nginx.ingress.kubernetes.io/session-cookie-name: "route"
-    nginx.ingress.kubernetes.io/session-cookie-hash: "sha1"
 spec:
+  ingressClassName: nginx
   rules:
   - host: nifi
     http:
