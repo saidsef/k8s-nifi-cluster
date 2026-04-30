@@ -18,7 +18,8 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - http:
+  - host: nifi
+    http:
       paths:
       - path: /
         pathType: Prefix
