@@ -11,7 +11,7 @@ This project demonstrates how to run an Apache NiFi 2.x Cluster in Kubernetes wi
 
 ## Deployments
 
-This will deploy Apache NiFi 2.7.2 in a Cluster mode using [Kubernetes Leases](https://kubernetes.io/docs/concepts/architecture/leases/) for leader election and Kubernetes ConfigMaps for state management:
+This will deploy Apache NiFi 2.9.0 in a Cluster mode using [Kubernetes Leases](https://kubernetes.io/docs/concepts/architecture/leases/) for leader election and Kubernetes ConfigMaps for state management:
 
 ```shell
 kubectl apply -k deployment/
@@ -27,20 +27,23 @@ kubectl apply -k deployment/
 
 ## Accessing the UI
 
-By default, NiFi 2.x requires HTTPS. You can access the UI using port-forwarding:
+NiFi runs HTTPS-only. With an nginx Ingress controller, access it via the Ingress host:
 
 ```shell
-kubectl port-forward svc/nifi 8443:8443 -n nifi
+# Add to /etc/hosts: 127.0.0.1 nifi
+kubectl port-forward svc/nifi 8443:8443 -n nifi  # fallback without ingress
 ```
 
-Then open: [https://localhost:8443/nifi](https://localhost:8443/nifi)
+Then open: [http://nifi/nifi](http://nifi/nifi)
+
+NiFi handles its own authentication — log in with the single-user credentials configured in `configmap.yml`.
 
 ### Default Credentials
 
 - **Username:** `admin`
 - **Password:** `Password123456`
 
-> :warning: **Important:** Update the `NIFI_SINGLE_USER_CREDENTIALS_PASSWORD` in `deployment/nifi/configmap.yml` and the `nifi-basic-auth` secret before production use.
+> :warning: **Important:** Change `SINGLE_USER_CREDENTIALS_PASSWORD` and `NIFI_SENSITIVE_PROPS_KEY` in `deployment/nifi/configmap.yml` before production use.
 
 ## Verification
 
