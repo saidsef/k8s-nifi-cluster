@@ -58,7 +58,7 @@ spec:
                 - CHOWN
                 - FOWNER
         - name: security-setup
-          image: docker.io/apache/nifi:2.7.2
+          image: docker.io/apache/nifi:2.9.0
           command:
           - /bin/bash
           - /scripts/security.sh
@@ -71,10 +71,6 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.name
-          envFrom:
-          - configMapRef:
-              name: nifi-cm
-              optional: false
           volumeMounts:
           - name: certs
             mountPath: /certs
@@ -83,34 +79,26 @@ spec:
             subPath: security.sh
       containers:
       - name: nifi
-        image: docker.io/apache/nifi:2.7.2
+        image: docker.io/apache/nifi:2.9.0
         imagePullPolicy: IfNotPresent
         command:
           - /bin/bash
           - -c
           - |
-            echo "Applying custom configuration..."
-            # Ensure paths and passwords are set correctly in nifi.properties
+            # Point NiFi at certs mounted from the shared PVC (start.sh does not handle custom cert paths)
             sed -i 's|nifi.security.keystore=.*|nifi.security.keystore=./conf/certs/keystore.p12|' /opt/nifi/nifi-current/conf/nifi.properties
             sed -i 's|nifi.security.truststore=.*|nifi.security.truststore=./conf/certs/truststore.p12|' /opt/nifi/nifi-current/conf/nifi.properties
             sed -i 's|nifi.security.keystorePasswd=.*|nifi.security.keystorePasswd=th1s1s3up34e5r37|' /opt/nifi/nifi-current/conf/nifi.properties
             sed -i 's|nifi.security.truststorePasswd=.*|nifi.security.truststorePasswd=th1s1s3up34e5r37|' /opt/nifi/nifi-current/conf/nifi.properties
             sed -i 's|nifi.security.keyPasswd=.*|nifi.security.keyPasswd=th1s1s3up34e5r37|' /opt/nifi/nifi-current/conf/nifi.properties
+            # Disable SNI check - start.sh has no env var for this property
             if grep -q "nifi.web.https.sni.host.check" /opt/nifi/nifi-current/conf/nifi.properties; then
               sed -i 's|nifi.web.https.sni.host.check=.*|nifi.web.https.sni.host.check=false|' /opt/nifi/nifi-current/conf/nifi.properties
             else
               echo "nifi.web.https.sni.host.check=false" >> /opt/nifi/nifi-current/conf/nifi.properties
             fi
-            sed -i 's|nifi.web.proxy.host=.*|nifi.web.proxy.host=nifi:8443|' /opt/nifi/nifi-current/conf/nifi.properties
-            
-            # Increase JVM heap
-            sed -i 's/-Xms1g/-Xms2g/' /opt/nifi/nifi-current/conf/bootstrap.conf
-            sed -i 's/-Xmx1g/-Xmx2g/' /opt/nifi/nifi-current/conf/bootstrap.conf
-
-            # Remove existing users/authorizations to force re-seed from mounted authorizers.xml
+            # Force fresh user/authorization state so single-user credentials are always applied
             rm -f /opt/nifi/nifi-current/conf/users.xml /opt/nifi/nifi-current/conf/authorizations.xml
-
-            # Start NiFi (start.sh sets single-user credentials via env vars automatically)
             /opt/nifi/scripts/start.sh
         ports:
         - containerPort: 11443
@@ -123,33 +111,23 @@ spec:
           - name: POD_IP
             valueFrom:
               fieldRef:
-                fieldPath: status.podIP # Use pod ip
+                fieldPath: status.podIP
           - name: POD_NAME
             valueFrom:
               fieldRef:
-                fieldPath: metadata.name # Use pod name
+                fieldPath: metadata.name
           - name: POD_NAMESPACE
             valueFrom:
               fieldRef:
-                fieldPath: metadata.namespace # Use pod namespace
+                fieldPath: metadata.namespace
           - name: NIFI_WEB_HTTPS_HOST
-            value: $(POD_IP)
-          - name: NIFI_UI_BANNER_TEXT
-            value: $(POD_NAME) # Use pod name for banner
+            value: $(POD_NAME).nifi.$(POD_NAMESPACE).svc.cluster.local
           - name: NIFI_CLUSTER_LOAD_BALANCE_HOST
-            value: $(POD_IP)
-          # - name: NIFI_WEB_HTTP_HOST
-          #   value: $(POD_NAME).nifi.$(POD_NAMESPACE).svc.cluster.local # Use pod fqdn as web host
-          - name: NIFI_CLUSTER_NODE_ADDRESS
-            value: $(POD_IP)
-          - name: NIFI_REMOTE_INPUT_SOCKET_HOST
             value: $(POD_IP)
           - name: NIFI_REMOTE_INPUT_HOST
             value: $(POD_IP)
           - name: HOSTNAME
             value: $(POD_NAME).nifi.$(POD_NAMESPACE).svc.cluster.local
-          - name: NODE_IDENTITY
-            value: "CN=nifi, OU=Cloud Services Application, O=Cloud Services, L=London, S=London, C=GB"
         envFrom:
           - configMapRef:
               name: nifi-cm
@@ -194,8 +172,8 @@ spec:
           successThreshold: 1
         resources:
           requests:
-            cpu: 2
-            memory: 4Gi
+            cpu: 500m
+            memory: 2Gi
           limits:
             cpu: 2
             memory: 4Gi

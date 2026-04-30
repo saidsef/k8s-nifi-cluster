@@ -11,9 +11,9 @@ resources:
 - configmap-ssl.yml
 - configmap-statemgmt.yml
 - configmap-authorizers.yml
+- cert-init.yml
 - nifi.yml
 - hpa.yml
-- secrets.yml
 - service.yml
 - sa.yml
 - rbac.yml
@@ -23,7 +23,7 @@ resources:
 images:
 - name: nifi
   newName: docker.io/apache/nifi
-  newTag: "2.7.2"
+  newTag: "2.9.0"
 - name: wait
   newName: docker.io/busybox
   newTag: "1.37"

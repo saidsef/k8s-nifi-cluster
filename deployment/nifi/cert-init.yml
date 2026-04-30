@@ -1,0 +1,84 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: nifi-cert-init
+  labels:
+    app: nifi
+  annotations:
+    app.kubernetes.io/name: nifi
+    app.kubernetes.io/part-of: nifi
+spec:
+  ttlSecondsAfterFinished: 600
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app: nifi
+    spec:
+      serviceAccountName: nifi
+      restartPolicy: OnFailure
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: cert-gen
+        image: docker.io/apache/nifi:2.9.0
+        command:
+        - /bin/bash
+        - -c
+        - |
+          set -e
+          NS="${POD_NAMESPACE}"
+          SECRET="nifi-certs"
+          API="https://kubernetes.default.svc"
+          TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+          CA="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            --cacert "$CA" -H "Authorization: Bearer $TOKEN" \
+            "$API/api/v1/namespaces/$NS/secrets/$SECRET")
+
+          if [ "$STATUS" = "200" ]; then
+            echo "Secret $SECRET already exists, skipping"
+            exit 0
+          fi
+
+          openssl req -x509 -newkey rsa:2048 \
+            -keyout /tmp/server.key -out /tmp/server.crt \
+            -days 3650 -nodes \
+            -subj "/CN=nifi" \
+            -addext "subjectAltName=DNS:localhost,DNS:nifi,DNS:*.nifi.$NS.svc.cluster.local,IP:127.0.0.1" \
+            -addext "basicConstraints=critical,CA:TRUE"
+
+          openssl pkcs12 -export \
+            -in /tmp/server.crt -inkey /tmp/server.key \
+            -out /tmp/keystore.p12 \
+            -passout pass:th1s1s3up34e5r37 \
+            -name nifi
+
+          cp /tmp/keystore.p12 /tmp/truststore.p12
+
+          KS=$(base64 -w0 /tmp/keystore.p12)
+          TS=$(base64 -w0 /tmp/truststore.p12)
+
+          curl -sf \
+            --cacert "$CA" -H "Authorization: Bearer $TOKEN" \
+            -H "Content-Type: application/json" \
+            -X POST "$API/api/v1/namespaces/$NS/secrets" \
+            -d "{\"apiVersion\":\"v1\",\"kind\":\"Secret\",\"metadata\":{\"name\":\"$SECRET\",\"namespace\":\"$NS\",\"labels\":{\"app\":\"nifi\"}},\"type\":\"Opaque\",\"data\":{\"keystore.p12\":\"$KS\",\"truststore.p12\":\"$TS\"}}"
+
+          echo "Created secret $SECRET"
+        env:
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        securityContext:
+          allowPrivilegeEscalation: false
+          privileged: false
+          capabilities:
+            drop:
+            - ALL
