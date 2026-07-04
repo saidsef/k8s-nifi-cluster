@@ -26,7 +26,7 @@ jobs:
           kubectl_version: v1.33.7
           node_image: kindest/node:v1.33.7
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Run K8s test
         run: |
           kubectl create namespace nifi
