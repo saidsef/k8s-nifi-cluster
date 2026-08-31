@@ -5,22 +5,31 @@ Kubernetes API rather than ZooKeeper, share one certificate, and are reached thr
 
 ![Architecture of the NiFi cluster on Kubernetes](./architecture.svg)
 
+## Ports
+
+| Port | Carries | Between |
+| --- | --- | --- |
+| 8443 | UI and API over HTTPS | client and node |
+| 11443 | cluster protocol under mutual TLS | node and node |
+| 6342 | load balanced flowfiles | node and node |
+
 ## Reaching the UI
 
 The Ingress is the only route in. NiFi binds its HTTPS connector to the pod's fully qualified
 name, not to all addresses. Nothing listens on the loopback address `kubectl port-forward`
 connects to. See [ingress and access](./ingress.md).
 
-The nginx Ingress carries three settings. Another controller needs their equivalents.
+The nginx Ingress carries four settings. Another controller needs their equivalents.
 
-NiFi is bound to HTTPS and has no plaintext port. The backend protocol on the Ingress is HTTPS.
-The certificate is self-signed and verification is off.
+| Setting | What it reflects |
+| --- | --- |
+| backend protocol HTTPS | NiFi is bound to HTTPS and has no plaintext port |
+| certificate verification off | the certificate is self-signed |
+| Host rewritten to `nifi:8443` | `NIFI_WEB_PROXY_HOST` allows that one value, anything else gives `421 Invalid Port Requested` |
+| sticky sessions by cookie | each node signs its own JWTs and rejects the other's |
 
-The Host header is rewritten to `nifi:8443`. `NIFI_WEB_PROXY_HOST` allows that one value, and NiFi
-answers `421 Invalid Port Requested` to anything else. Rewriting keeps the allowlist to a single
-entry whatever name you reach the cluster under.
-
-Sessions are pinned to a node by cookie. Each node signs its own JWTs and rejects the other's.
+Rewriting the Host keeps the allowlist to a single entry whatever name you reach the cluster
+under.
 
 ## Forming a cluster
 
@@ -28,8 +37,7 @@ Sessions are pinned to a node by cookie. Each node signs its own JWTs and reject
 nodes and holds the authoritative view of membership. The primary node runs isolated processors.
 Either pod can hold either lease, and the holder changes when pods restart.
 
-Nodes talk to each other directly, not through the Service. Port 11443 carries the cluster
-protocol under mutual TLS. Port 6342 carries flowfiles between nodes.
+Nodes talk to each other directly, not through the Service.
 
 Flow election decides whose flow becomes the cluster's. It waits for two votes, matching the
 replica count, or gives up after `NIFI_ELECTION_MAX_WAIT`. The first node retries every five
@@ -47,8 +55,14 @@ holding that one entry. Later pods reuse the keystore they find. All nodes hold 
 trust that one certificate. The cluster protocol handshake succeeds between them and fails for
 anything else.
 
-The certificate covers `localhost`, `127.0.0.1`, `nifi`, and the service and pod names in its
-namespace. Any other hostname gives `400 Invalid SNI`.
+The certificate's SAN covers:
+
+- `localhost` and `127.0.0.1`
+- `nifi`, the Service name
+- `nifi.<namespace>.svc.cluster.local`, the Service FQDN
+- `*.nifi.<namespace>.svc.cluster.local`, every pod
+
+Any other hostname gives `400 Invalid SNI`.
 
 The volume has to be ReadWriteMany. Two pods on two nodes backed by node-local storage each
 generate their own keystore. Neither trusts the other and the cluster never forms. See
@@ -60,18 +74,24 @@ start. Those credentials always apply.
 
 ## What is kept
 
-The certificates are on the shared volume and cluster state is in ConfigMaps. Both outlive the
-pods. Everything else sits on the container's writable layer: the flow, the flowfile, content and
-provenance repositories, and local state.
+| Data | Where it lives | Survives losing the pod |
+| --- | --- | --- |
+| Certificates | shared PVC | yes |
+| Cluster state | ConfigMaps | yes |
+| Flow | container writable layer | only through the surviving node |
+| Flowfile, content and provenance repositories | container writable layer | no |
+| Local state | container writable layer | no |
 
 A rolling restart is safe. The surviving node replicates the flow back to the one that comes up.
 Losing both pods at once loses the flow. See [layout](./layout.md#what-is-not-persisted).
 
 ## Starting up
 
-`fix-permissions` takes ownership of the certificate directory as root. `security-setup` generates
-the keystore, or finds one and leaves it. The main container rewrites `nifi.properties` for the
-shared certificate paths, disables the SNI host check, clears the user files, and starts NiFi.
+1. `fix-permissions` takes ownership of the certificate directory as root.
+2. `security-setup` generates the keystore, or finds one and leaves it.
+3. The main container rewrites `nifi.properties` for the shared certificate paths, disables the
+   SNI host check and clears the user files.
+4. `start.sh` brings NiFi up.
 
 `nifi-0` reports ready once port 11443 is listening, about a minute in. `OrderedReady` holds
 `nifi-1` back until then, and a first start takes several minutes.
