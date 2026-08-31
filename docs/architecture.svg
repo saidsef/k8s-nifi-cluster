@@ -129,7 +129,7 @@
   <text class="sm" x="72" y="526">Role and RoleBinding</text>
   <text class="mu" x="72" y="546">leases and configmaps</text>
 
-  <rect class="sts" x="88" y="576" width="704" height="252" rx="8"/>
+  <rect class="sts" x="88" y="576" width="704" height="236" rx="8"/>
   <text class="mu" x="400" y="592" text-anchor="middle">StatefulSet: nifi, replicas 2, OrderedReady</text>
 
   <path class="bus" d="M 440 544 V 566"/>
@@ -137,38 +137,36 @@
   <path class="flow" d="M 160 566 V 596"/>
   <path class="flow" d="M 540 566 V 596"/>
 
-  <rect class="b-pod" x="100" y="600" width="280" height="212" rx="6"/>
+  <rect class="b-pod" x="100" y="600" width="280" height="196" rx="6"/>
   <text class="bt" x="112" y="622">Pod: nifi-0</text>
   <rect class="b-inner" x="112" y="632" width="256" height="30" rx="4"/>
   <text class="sm" x="122" y="651">init: fix-permissions</text>
   <rect class="b-inner" x="112" y="668" width="256" height="30" rx="4"/>
   <text class="sm" x="122" y="687">init: security-setup</text>
-  <rect class="b-inner" x="112" y="704" width="256" height="96" rx="4"/>
-  <text class="bt" x="122" y="723">nifi 2.11.0</text>
+  <rect class="b-inner" x="112" y="704" width="256" height="80" rx="4"/>
+  <text class="bt" x="122" y="723">nifi</text>
   <text class="sm" x="122" y="740">8443 UI and API</text>
   <text class="sm" x="122" y="756">11443 cluster protocol</text>
   <text class="sm" x="122" y="772">6342 load balance</text>
-  <text class="mu" x="122" y="788">heap 512m to 2g</text>
 
-  <rect class="b-pod" x="500" y="600" width="280" height="212" rx="6"/>
+  <rect class="b-pod" x="500" y="600" width="280" height="196" rx="6"/>
   <text class="bt" x="512" y="622">Pod: nifi-1</text>
   <rect class="b-inner" x="512" y="632" width="256" height="30" rx="4"/>
   <text class="sm" x="522" y="651">init: fix-permissions</text>
   <rect class="b-inner" x="512" y="668" width="256" height="30" rx="4"/>
   <text class="sm" x="522" y="687">init: security-setup</text>
-  <rect class="b-inner" x="512" y="704" width="256" height="96" rx="4"/>
-  <text class="bt" x="522" y="723">nifi 2.11.0</text>
+  <rect class="b-inner" x="512" y="704" width="256" height="80" rx="4"/>
+  <text class="bt" x="522" y="723">nifi</text>
   <text class="sm" x="522" y="740">8443 UI and API</text>
   <text class="sm" x="522" y="756">11443 cluster protocol</text>
   <text class="sm" x="522" y="772">6342 load balance</text>
-  <text class="mu" x="522" y="788">heap 512m to 2g</text>
 
   <path class="flow2" d="M 384 706 H 496"/>
   <text class="lb" x="440" y="692" text-anchor="middle">11443 mTLS</text>
   <text class="lb" x="440" y="726" text-anchor="middle">6342 data</text>
 
-  <path class="flow" d="M 240 812 V 844"/>
-  <path class="flow" d="M 640 812 V 844"/>
+  <path class="flow" d="M 240 796 V 844"/>
+  <path class="flow" d="M 640 796 V 844"/>
 
   <rect class="b-pvc" x="100" y="848" width="680" height="64" rx="6"/>
   <text class="bt" x="112" y="870">PersistentVolumeClaim: nifi-shared-certs, ReadWriteMany</text>
