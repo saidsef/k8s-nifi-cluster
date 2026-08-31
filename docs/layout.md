@@ -1,6 +1,6 @@
 # Layout
 
-```
+```text
 deployment/
 ├── kustomization.yml   # default entry point -> nginx
 ├── base/               # NiFi itself, no Ingress

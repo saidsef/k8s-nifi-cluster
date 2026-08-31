@@ -45,7 +45,7 @@ NiFi handles its own authentication - log in with the single-user credentials co
 - **Password:** `Password123456`
 
 > :warning: **Important:** Change `SINGLE_USER_CREDENTIALS_PASSWORD`, `NIFI_SENSITIVE_PROPS_KEY` and the keystore password before production use. See [Configuration](./docs/configuration.md#before-production).
-
+>
 > :warning: `kubectl port-forward` does not reach the UI. See [why](./docs/ingress.md#why-port-forward-does-not-work).
 
 ## Verification
@@ -71,7 +71,7 @@ We would :heart: you to contribute by making a [pull request](https://github.com
 
 Please read the official [Contribution Guide](./CONTRIBUTING.md) for more information on how you can contribute.
 
-## Useful links:
+## Useful links
 
 - [NiFi 2.0 Migration Guide](https://cwiki.apache.org/confluence/display/NIFI/NiFi+2.0+Migration+Guide)
 - [NiFi System Administrator’s Guide](https://nifi.apache.org/docs/nifi-docs/html/administration-guide.html)

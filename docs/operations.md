@@ -8,7 +8,7 @@ kubectl get pods,leases,hpa -n nifi
 
 Healthy means two pods `1/1`, and both leases held:
 
-```
+```text
 lease.coordination.k8s.io/cluster-coordinator   nifi-1.nifi.nifi.svc.cluster.local:11443
 lease.coordination.k8s.io/primary-node          nifi-1.nifi.nifi.svc.cluster.local:11443
 ```

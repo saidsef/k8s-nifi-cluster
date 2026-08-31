@@ -66,7 +66,7 @@ image is pulled.
 Flow election then needs both votes, because `NIFI_ELECTION_MAX_CANDIDATES` is 2. Until the second
 node casts its vote the first one logs this on a loop, and it is not a fault:
 
-```
+```text
 Requested by cluster coordinator to retry connection in 5 seconds with explanation:
 Cluster is still voting on which Flow is the correct flow for the cluster.
 ```
