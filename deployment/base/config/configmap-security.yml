@@ -5,7 +5,8 @@ metadata:
 data:
   security.sh: |
     #!/bin/bash
-    set -ex -o allexport
+    # No -x: it would echo the keystore password into the pod log.
+    set -e -o allexport
 
     CERTS_DIR="/certs"
     KEYSTORE_PATH="${CERTS_DIR}/keystore.p12"
@@ -13,7 +14,7 @@ data:
 
     if [[ ! -f "${KEYSTORE_PATH}" ]]; then
         echo "Generating cluster-wide certificates in shared volume..."
-        
+
         ORGANISATION_UNIT=${ORGANISATION_UNIT:-'Cloud Services Application'}
         ORGANISATION=${ORGANISATION:-'Cloud Services'}
         CITY=${CITY:-'London'}
@@ -21,16 +22,22 @@ data:
         COUNTRY_CODE=${COUNTRY_CODE:-'GB'}
         KEYSTORE_PASS="th1s1s3up34e5r37"
         TRUSTSTORE_PASS="th1s1s3up34e5r37"
+        SERVICE_NAME=${SERVICE_NAME:-'nifi'}
+        CLUSTER_DOMAIN=${CLUSTER_DOMAIN:-'cluster.local'}
 
-        SAN="dns:localhost,ip:127.0.0.1,dns:nifi,dns:*.nifi.nifi.svc.cluster.local"
+        # Derived from the running namespace so an overlay can relocate the release.
+        POD_DOMAIN="${SERVICE_NAME}.${POD_NAMESPACE}.svc.${CLUSTER_DOMAIN}"
+        SAN="dns:localhost,ip:127.0.0.1,dns:${SERVICE_NAME},dns:${POD_DOMAIN},dns:*.${POD_DOMAIN}"
+        echo "Certificate SAN: ${SAN}"
 
         keytool -genkey -noprompt -alias nifi-keystore \
-        -dname "CN=nifi,OU=${ORGANISATION_UNIT},O=${ORGANISATION},L=${CITY},S=${STATE},C=${COUNTRY_CODE}" \
+        -dname "CN=${SERVICE_NAME},OU=${ORGANISATION_UNIT},O=${ORGANISATION},L=${CITY},S=${STATE},C=${COUNTRY_CODE}" \
         -keystore "${KEYSTORE_PATH}" \
         -storepass "${KEYSTORE_PASS}" \
         -keysize 2048 \
         -keypass "${KEYSTORE_PASS}" \
         -keyalg RSA \
+        -validity 3650 \
         -ext "SAN=${SAN}" \
         -ext "basicConstraints=CA:true" \
         -storetype pkcs12
@@ -48,6 +55,10 @@ data:
         -storetype pkcs12 \
         -storepass "${TRUSTSTORE_PASS}" \
         -trustcacerts
+
+        # Private key material: readable by the nifi user only.
+        chmod 600 "${KEYSTORE_PATH}" "${TRUSTSTORE_PATH}"
+        chmod 644 "${CERTS_DIR}/nifi-cert.cer"
     else
         echo "Shared certificates found."
     fi
