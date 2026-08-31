@@ -8,6 +8,7 @@ This project demonstrates how to run an Apache NiFi 2.x Cluster in Kubernetes wi
 
 - Kubernetes Cluster >= v1.23
 - `kubectl` with Kustomize support
+- An Ingress controller, see [Ingress and access](./docs/ingress.md)
 
 ## Deployments
 
@@ -25,67 +26,14 @@ kubectl apply -k deployment/
 - **Security:** Automatic self-signed certificate generation for HTTPS
 - **Access:** Ingress and Service for external/internal access
 
-### Layout
-
-```
-deployment/
-├── kustomization.yml   # default entry point -> nginx
-├── base/               # NiFi itself, no Ingress
-│   ├── namespace/
-│   ├── config/         # ConfigMaps: env, authorizers, state management, cert script
-│   └── nifi/           # RBAC, storage, Service, StatefulSet, HPA
-└── nginx/              # base + an nginx Ingress
-```
-
-Every folder carries its own `kustomization.yml`, so each can be built on its own with
-`kubectl kustomize <path>`.
-
-## Ingress
-
-The Ingress is kept out of the base so you can bring your own controller.
-
-| Command | Deploys |
-| --- | --- |
-| `kubectl apply -k deployment/` | base + nginx Ingress (default) |
-| `kubectl apply -k deployment/nginx` | the same, stated explicitly |
-| `kubectl apply -k deployment/base` | NiFi only - no Ingress |
-
-To use a different controller, add a folder next to `nginx/` that layers your own resource on
-top of the base. For example `deployment/traefik/kustomization.yml`:
-
-```yaml
----
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-
-namespace: nifi
-
-resources:
-- ../base
-- ingress.yml
-```
-
-Then place your Ingress, Gateway or `LoadBalancer` Service in `deployment/traefik/ingress.yml` and
-apply with `kubectl apply -k deployment/traefik`. Route traffic to the `nifi` Service on port
-`8443`, and note that the backend speaks HTTPS with a self-signed certificate - your controller
-will need the equivalent of the backend-protocol, SNI and sticky-session settings in
-`deployment/nginx/ingress.yml`.
-
-The NiFi image tags are pinned in `deployment/base/nifi/kustomization.yml`, which overrides the
-tags written in the manifests.
-
 ## Accessing the UI
 
-NiFi runs HTTPS-only. With an nginx Ingress controller, access it via the Ingress host:
+NiFi runs HTTPS-only and is reached through the Ingress. Point the host at your ingress
+controller, for example by adding `127.0.0.1 nifi` to `/etc/hosts`, then open
+[http://nifi/nifi](http://nifi/nifi).
 
-```shell
-# Add to /etc/hosts: 127.0.0.1 nifi
-kubectl port-forward svc/nifi 8443:8443 -n nifi  # fallback without ingress
-```
-
-Then open: [http://nifi/nifi](http://nifi/nifi)
-
-NiFi handles its own authentication - log in with the single-user credentials configured in `configmap-env.yml`.
+NiFi handles its own authentication - log in with the single-user credentials configured in
+`deployment/base/config/configmap-env.yml`.
 
 ### Default Credentials
 
@@ -94,11 +42,19 @@ NiFi handles its own authentication - log in with the single-user credentials co
 
 > :warning: **Important:** Change `SINGLE_USER_CREDENTIALS_PASSWORD` and `NIFI_SENSITIVE_PROPS_KEY` in `deployment/base/config/configmap-env.yml` before production use.
 
+> :warning: `kubectl port-forward` does not reach the UI. See [why](./docs/ingress.md#why-port-forward-does-not-work).
+
 ## Verification
 
 ```shell
 kubectl get all,ing,leases -n nifi
 ```
+
+## Documentation
+
+- [Layout](./docs/layout.md) - how `deployment/` is organised, image pinning, relocating the release
+- [Ingress and access](./docs/ingress.md) - deploy targets, bringing your own controller, why port-forward fails
+- [Local testing with kind](./docs/local-testing.md) - reproduce the CI cluster locally
 
 ## Contributing
 
