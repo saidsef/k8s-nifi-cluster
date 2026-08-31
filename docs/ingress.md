@@ -43,6 +43,12 @@ Sticky sessions are load bearing, not an optimisation. Each node signs its own J
 issued by one node is rejected by the other with `Signed JWT rejected: Another algorithm expected,
 or no matching key(s) found`.
 
+Two failures are worth knowing before you start, because neither error says what it means. A
+`host:port` NiFi has not been told about gives `421 Invalid Port Requested`, and a hostname
+outside the certificate's SAN gives `400 Invalid SNI`. Both are covered in
+[operations](./operations.md#when-something-is-wrong), and the allowlist that drives the first is
+`NIFI_WEB_PROXY_HOST` in [configuration](./configuration.md).
+
 ## Why port-forward does not work
 
 `kubectl port-forward svc/nifi 8443:8443 -n nifi` fails with `connection refused`.

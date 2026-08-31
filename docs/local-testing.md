@@ -50,6 +50,9 @@ Expect `"connectedNodes":"2 / 2"`. The cookie jar matters, see
 The HPA needs `metrics-server`, which kind does not ship. Install it with `--kubelet-insecure-tls`
 if you want to exercise scaling, otherwise the HPA reports `<unknown>` targets.
 
+If it does not come up, [operations](./operations.md#when-something-is-wrong) lists what the
+errors mean.
+
 ## Teardown
 
 ```shell

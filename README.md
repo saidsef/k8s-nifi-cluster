@@ -9,6 +9,10 @@ This project demonstrates how to run an Apache NiFi 2.x Cluster in Kubernetes wi
 - Kubernetes Cluster >= v1.23
 - `kubectl` with Kustomize support
 - An Ingress controller, see [Ingress and access](./docs/ingress.md)
+- ReadWriteMany storage for the shared certificate volume, see [Deploying](./docs/deploying.md#the-shared-certificate-volume)
+
+New to this? [Local testing with kind](./docs/local-testing.md) gets you a working cluster in one
+page. Read [Deploying](./docs/deploying.md) before putting it on a real one.
 
 ## Deployments
 
@@ -40,7 +44,7 @@ NiFi handles its own authentication - log in with the single-user credentials co
 - **Username:** `admin`
 - **Password:** `Password123456`
 
-> :warning: **Important:** Change `SINGLE_USER_CREDENTIALS_PASSWORD` and `NIFI_SENSITIVE_PROPS_KEY` in `deployment/base/config/configmap-env.yml` before production use.
+> :warning: **Important:** Change `SINGLE_USER_CREDENTIALS_PASSWORD`, `NIFI_SENSITIVE_PROPS_KEY` and the keystore password before production use. See [Configuration](./docs/configuration.md#before-production).
 
 > :warning: `kubectl port-forward` does not reach the UI. See [why](./docs/ingress.md#why-port-forward-does-not-work).
 
@@ -52,8 +56,13 @@ kubectl get all,ing,leases -n nifi
 
 ## Documentation
 
-- [Layout](./docs/layout.md) - how `deployment/` is organised, image pinning, relocating the release
+Full index in [docs/](./docs/README.md).
+
+- [Deploying](./docs/deploying.md) - what your cluster needs, and what the first start looks like
 - [Ingress and access](./docs/ingress.md) - deploy targets, bringing your own controller, why port-forward fails
+- [Configuration](./docs/configuration.md) - every ConfigMap setting, and what to change before production
+- [Operations](./docs/operations.md) - health checks, and what the errors mean
+- [Layout](./docs/layout.md) - how `deployment/` is organised, image pinning, relocating the release
 - [Local testing with kind](./docs/local-testing.md) - reproduce the CI cluster locally
 
 ## Contributing
