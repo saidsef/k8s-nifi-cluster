@@ -1,8 +1,13 @@
+---
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
 - role: control-plane
   image: kindest/node:v1.36.1
+  # The ingress controller selects on this label, so it lands on the node that
+  # owns the 80/443 host port mappings below.
+  labels:
+    ingress-ready: "true"
   extraPortMappings:
   - containerPort: 80
     hostPort: 80
