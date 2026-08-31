@@ -9,7 +9,6 @@ resources:
 - persistentvolume-certs.yml
 - persistentvolumeclaim-certs.yml
 - service.yml
-- job-cert-init.yml
 - statefulset.yml
 - hpa.yml
 

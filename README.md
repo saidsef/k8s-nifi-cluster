@@ -33,7 +33,7 @@ deployment/
 ├── base/               # NiFi itself, no Ingress
 │   ├── namespace/
 │   ├── config/         # ConfigMaps: env, authorizers, state management, cert script
-│   └── nifi/           # RBAC, storage, Service, cert-init Job, StatefulSet, HPA
+│   └── nifi/           # RBAC, storage, Service, StatefulSet, HPA
 └── nginx/              # base + an nginx Ingress
 ```
 
