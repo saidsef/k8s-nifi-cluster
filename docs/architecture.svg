@@ -56,6 +56,7 @@
     .b-api { fill: var(--api-fill); stroke: var(--api-stroke); }
     .b-hpa { fill: var(--hpa-fill); stroke: var(--hpa-stroke); }
     .flow { fill: none; stroke: var(--arrow); stroke-width: 1.6; marker-end: url(#a); }
+    .bus { fill: none; stroke: var(--arrow); stroke-width: 1.6; }
     .flow2 { fill: none; stroke: var(--arrow); stroke-width: 1.6; marker-end: url(#a); marker-start: url(#a); }
     .cfg { fill: none; stroke: var(--arrow2); stroke-width: 1.4; stroke-dasharray: 5 4; marker-end: url(#a); }
     .ah { fill: var(--arrow); }
@@ -75,122 +76,116 @@
   <rect class="cluster" x="24" y="76" width="992" height="868" rx="10"/>
   <text class="zone" x="40" y="98">Kubernetes cluster</text>
 
-  <rect class="b-client" x="48" y="116" width="210" height="56" rx="6"/>
-  <text class="bt" x="60" y="138">Browser or API client</text>
-  <text class="mu" x="60" y="156">https://nifi/nifi</text>
+  <rect class="b-client" x="330" y="112" width="220" height="56" rx="6"/>
+  <text class="bt" x="342" y="134">Browser or API client</text>
+  <text class="mu" x="342" y="152">https://nifi/nifi</text>
 
-  <path class="flow" d="M 153 172 V 204"/>
-  <text class="lb" x="162" y="192">80 and 443</text>
+  <path class="flow" d="M 440 168 V 200"/>
+  <text class="lb" x="450" y="188">80 and 443</text>
 
-  <rect class="b-client" x="48" y="204" width="210" height="56" rx="6"/>
-  <text class="bt" x="60" y="226">Ingress controller</text>
-  <text class="mu" x="60" y="244">nginx, outside the nifi namespace</text>
+  <rect class="b-client" x="330" y="200" width="220" height="56" rx="6"/>
+  <text class="bt" x="342" y="222">Ingress controller</text>
+  <text class="mu" x="342" y="240">nginx, in its own namespace</text>
 
-  <path class="flow" d="M 153 260 V 332"/>
+  <path class="flow" d="M 440 256 V 332"/>
 
-  <rect class="ns" x="48" y="300" width="680" height="624" rx="10"/>
-  <text class="zone" x="62" y="322">namespace: nifi</text>
+  <rect class="ns" x="40" y="300" width="800" height="628" rx="10"/>
+  <text class="zone" x="54" y="322">namespace: nifi</text>
 
-  <rect class="b-ing" x="68" y="336" width="300" height="108" rx="6"/>
-  <text class="bt" x="80" y="358">Ingress: nifi</text>
-  <text class="bd" x="80" y="378">host: nifi</text>
-  <text class="bd" x="80" y="395">backend-protocol: HTTPS</text>
-  <text class="bd" x="80" y="412">affinity: cookie, name route</text>
-  <text class="bd" x="80" y="429">upstream-vhost: nifi:8443</text>
+  <rect class="b-cm" x="60" y="336" width="220" height="108" rx="6"/>
+  <text class="bt" x="72" y="358">ConfigMaps</text>
+  <text class="bd" x="72" y="378">nifi-cm, environment</text>
+  <text class="bd" x="72" y="395">nifi-ssl-cm, certificates</text>
+  <text class="bd" x="72" y="412">nifi-state-mgmt-cm, state</text>
+  <text class="bd" x="72" y="429">nifi-authorizers-cm, auth</text>
 
-  <path class="flow" d="M 218 444 V 472"/>
+  <rect class="b-ing" x="300" y="336" width="280" height="108" rx="6"/>
+  <text class="bt" x="312" y="358">Ingress: nifi</text>
+  <text class="bd" x="312" y="378">host nifi</text>
+  <text class="bd" x="312" y="395">backend protocol HTTPS</text>
+  <text class="bd" x="312" y="412">sticky sessions by cookie</text>
+  <text class="bd" x="312" y="429">Host rewritten to nifi:8443</text>
 
-  <rect class="b-svc" x="68" y="472" width="300" height="72" rx="6"/>
-  <text class="bt" x="80" y="494">Service: nifi (ClusterIP)</text>
-  <text class="sm" x="80" y="513">8443 https, 11443 cluster, 6342 load balance</text>
-  <text class="mu" x="80" y="530">stable DNS for every pod</text>
+  <rect class="b-hpa" x="600" y="336" width="220" height="108" rx="6"/>
+  <text class="bt" x="612" y="358">HorizontalPodAutoscaler</text>
+  <text class="bd" x="612" y="378">min 2, max 8</text>
+  <text class="bd" x="612" y="395">cpu and memory at 90%</text>
+  <text class="bd" x="612" y="412">scale up window 300s</text>
+  <text class="mu" x="612" y="430">needs metrics-server</text>
 
-  <rect class="b-cm" x="392" y="336" width="324" height="108" rx="6"/>
-  <text class="bt" x="404" y="358">ConfigMaps</text>
-  <text class="bd" x="404" y="378">nifi-cm, environment and credentials</text>
-  <text class="bd" x="404" y="395">nifi-ssl-cm, certificate script</text>
-  <text class="bd" x="404" y="412">nifi-state-mgmt-cm, state providers</text>
-  <text class="bd" x="404" y="429">nifi-authorizers-cm, single user authorizer</text>
+  <path class="flow" d="M 440 444 V 472"/>
+  <path class="cfg" d="M 250 444 V 596"/>
+  <text class="lb" x="258" y="462">mounted into every pod</text>
+  <path class="flow" d="M 710 444 V 572"/>
 
-  <path class="cfg" d="M 640 444 V 552"/>
-  <text class="lb" x="632" y="500" text-anchor="end">mounted into every pod</text>
+  <rect class="b-svc" x="300" y="472" width="280" height="72" rx="6"/>
+  <text class="bt" x="312" y="494">Service: nifi (ClusterIP)</text>
+  <text class="sm" x="312" y="513">8443 https, 11443 cluster, 6342 load balance</text>
+  <text class="mu" x="312" y="530">stable DNS for every pod</text>
 
-  <rect class="sts" x="60" y="556" width="656" height="268" rx="8"/>
-  <text class="mu" x="708" y="574" text-anchor="end">StatefulSet: nifi</text>
-  <text class="mu" x="708" y="590" text-anchor="end">replicas 2, OrderedReady</text>
+  <rect class="b-cm" x="60" y="468" width="160" height="104" rx="6"/>
+  <text class="bt" x="72" y="490">RBAC</text>
+  <text class="sm" x="72" y="510">ServiceAccount: nifi</text>
+  <text class="sm" x="72" y="526">Role and RoleBinding</text>
+  <text class="mu" x="72" y="546">leases and configmaps</text>
 
-  <path class="flow" d="M 216 544 V 592"/>
-  <path class="flow" d="M 216 566 H 568 V 592"/>
+  <rect class="sts" x="88" y="576" width="704" height="252" rx="8"/>
+  <text class="mu" x="400" y="592" text-anchor="middle">StatefulSet: nifi, replicas 2, OrderedReady</text>
 
-  <rect class="b-pod" x="76" y="596" width="280" height="212" rx="6"/>
-  <text class="bt" x="88" y="618">Pod: nifi-0</text>
-  <rect class="b-inner" x="88" y="628" width="256" height="30" rx="4"/>
-  <text class="sm" x="98" y="647">init: fix-permissions</text>
-  <rect class="b-inner" x="88" y="664" width="256" height="30" rx="4"/>
-  <text class="sm" x="98" y="683">init: security-setup</text>
-  <rect class="b-inner" x="88" y="700" width="256" height="96" rx="4"/>
-  <text class="bt" x="98" y="719">nifi 2.11.0</text>
-  <text class="sm" x="98" y="736">8443 UI and API</text>
-  <text class="sm" x="98" y="752">11443 cluster protocol</text>
-  <text class="sm" x="98" y="768">6342 load balance</text>
-  <text class="mu" x="98" y="784">heap 512m to 2g</text>
+  <path class="bus" d="M 440 544 V 566"/>
+  <path class="bus" d="M 160 566 H 540"/>
+  <path class="flow" d="M 160 566 V 596"/>
+  <path class="flow" d="M 540 566 V 596"/>
 
-  <rect class="b-pod" x="428" y="596" width="280" height="212" rx="6"/>
-  <text class="bt" x="440" y="618">Pod: nifi-1</text>
-  <rect class="b-inner" x="440" y="628" width="256" height="30" rx="4"/>
-  <text class="sm" x="450" y="647">init: fix-permissions</text>
-  <rect class="b-inner" x="440" y="664" width="256" height="30" rx="4"/>
-  <text class="sm" x="450" y="683">init: security-setup</text>
-  <rect class="b-inner" x="440" y="700" width="256" height="96" rx="4"/>
-  <text class="bt" x="450" y="719">nifi 2.11.0</text>
-  <text class="sm" x="450" y="736">8443 UI and API</text>
-  <text class="sm" x="450" y="752">11443 cluster protocol</text>
-  <text class="sm" x="450" y="768">6342 load balance</text>
-  <text class="mu" x="450" y="784">heap 512m to 2g</text>
+  <rect class="b-pod" x="100" y="600" width="280" height="212" rx="6"/>
+  <text class="bt" x="112" y="622">Pod: nifi-0</text>
+  <rect class="b-inner" x="112" y="632" width="256" height="30" rx="4"/>
+  <text class="sm" x="122" y="651">init: fix-permissions</text>
+  <rect class="b-inner" x="112" y="668" width="256" height="30" rx="4"/>
+  <text class="sm" x="122" y="687">init: security-setup</text>
+  <rect class="b-inner" x="112" y="704" width="256" height="96" rx="4"/>
+  <text class="bt" x="122" y="723">nifi 2.11.0</text>
+  <text class="sm" x="122" y="740">8443 UI and API</text>
+  <text class="sm" x="122" y="756">11443 cluster protocol</text>
+  <text class="sm" x="122" y="772">6342 load balance</text>
+  <text class="mu" x="122" y="788">heap 512m to 2g</text>
 
-  <path class="flow2" d="M 360 700 H 424"/>
-  <text class="lb" x="392" y="686" text-anchor="middle">11443 mTLS</text>
-  <text class="lb" x="392" y="720" text-anchor="middle">6342 data</text>
+  <rect class="b-pod" x="500" y="600" width="280" height="212" rx="6"/>
+  <text class="bt" x="512" y="622">Pod: nifi-1</text>
+  <rect class="b-inner" x="512" y="632" width="256" height="30" rx="4"/>
+  <text class="sm" x="522" y="651">init: fix-permissions</text>
+  <rect class="b-inner" x="512" y="668" width="256" height="30" rx="4"/>
+  <text class="sm" x="522" y="687">init: security-setup</text>
+  <rect class="b-inner" x="512" y="704" width="256" height="96" rx="4"/>
+  <text class="bt" x="522" y="723">nifi 2.11.0</text>
+  <text class="sm" x="522" y="740">8443 UI and API</text>
+  <text class="sm" x="522" y="756">11443 cluster protocol</text>
+  <text class="sm" x="522" y="772">6342 load balance</text>
+  <text class="mu" x="522" y="788">heap 512m to 2g</text>
 
-  <path class="flow" d="M 216 808 V 840"/>
-  <path class="flow" d="M 568 808 V 840"/>
+  <path class="flow2" d="M 384 706 H 496"/>
+  <text class="lb" x="440" y="692" text-anchor="middle">11443 mTLS</text>
+  <text class="lb" x="440" y="726" text-anchor="middle">6342 data</text>
 
-  <rect class="b-pvc" x="76" y="844" width="640" height="64" rx="6"/>
-  <text class="bt" x="88" y="866">PersistentVolumeClaim: nifi-shared-certs, ReadWriteMany</text>
-  <text class="sm" x="88" y="884">keystore.p12 and truststore.p12, generated once by the first node</text>
-  <text class="mu" x="88" y="900">backed by nifi-certs-pv, a hostPath volume, replace it on a real cluster</text>
+  <path class="flow" d="M 240 812 V 844"/>
+  <path class="flow" d="M 640 812 V 844"/>
 
-  <rect class="b-hpa" x="792" y="336" width="216" height="124" rx="6"/>
-  <text class="bt" x="804" y="358">HorizontalPodAutoscaler</text>
-  <text class="bd" x="804" y="378">min 2, max 8</text>
-  <text class="bd" x="804" y="395">cpu and memory at 90%</text>
-  <text class="bd" x="804" y="412">scale up window 300s</text>
-  <text class="mu" x="804" y="430">needs metrics-server</text>
+  <rect class="b-pvc" x="100" y="848" width="680" height="64" rx="6"/>
+  <text class="bt" x="112" y="870">PersistentVolumeClaim: nifi-shared-certs, ReadWriteMany</text>
+  <text class="sm" x="112" y="888">keystore.p12 and truststore.p12, generated once by the first node</text>
+  <text class="mu" x="112" y="904">backed by nifi-certs-pv, a hostPath volume, replace it on a real cluster</text>
 
-  <path class="flow" d="M 792 434 L 724 550"/>
+  <rect class="b-api" x="864" y="600" width="144" height="176" rx="6"/>
+  <text class="bt" x="876" y="622">Kubernetes API</text>
+  <text class="bd" x="876" y="644">Leases</text>
+  <text class="sm" x="886" y="661">cluster-coordinator</text>
+  <text class="sm" x="886" y="677">primary-node</text>
+  <text class="bd" x="876" y="700">ConfigMaps</text>
+  <text class="sm" x="886" y="717">cluster state</text>
+  <text class="mu" x="876" y="741">reached by the</text>
+  <text class="mu" x="876" y="755">nifi ServiceAccount</text>
 
-  <rect class="b-api" x="792" y="500" width="216" height="176" rx="6"/>
-  <text class="bt" x="804" y="522">Kubernetes API</text>
-  <text class="bd" x="804" y="544">Leases</text>
-  <text class="sm" x="816" y="561">cluster-coordinator</text>
-  <text class="sm" x="816" y="577">primary-node</text>
-  <text class="bd" x="804" y="600">ConfigMaps</text>
-  <text class="sm" x="816" y="617">cluster state provider</text>
-  <text class="sm" x="816" y="633">one per component</text>
-  <text class="mu" x="804" y="657">reached by the nifi</text>
-  <text class="mu" x="804" y="670">ServiceAccount</text>
-
-  <path class="flow" d="M 712 600 H 788"/>
-
-  <path class="cfg" d="M 900 708 V 682"/>
-
-  <rect class="b-cm" x="792" y="712" width="216" height="124" rx="6"/>
-  <text class="bt" x="804" y="734">RBAC</text>
-  <text class="bd" x="804" y="754">ServiceAccount: nifi</text>
-  <text class="bd" x="804" y="771">Role: nifi-role</text>
-  <text class="bd" x="804" y="788">RoleBinding: nifi-rolebinding</text>
-  <text class="mu" x="804" y="808">full verbs on leases and</text>
-  <text class="mu" x="804" y="822">configmaps in the namespace</text>
+  <path class="flow" d="M 784 690 H 860"/>
 
   <path class="flow" d="M 32 966 H 66"/>
   <text class="lb" x="74" y="970">request path</text>
