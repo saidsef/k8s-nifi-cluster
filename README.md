@@ -34,7 +34,7 @@ kubectl apply -k deployment/
 
 NiFi runs HTTPS-only and is reached through the Ingress. Point the host at your ingress
 controller, for example by adding `127.0.0.1 nifi` to `/etc/hosts`, then open
-[http://nifi/nifi](http://nifi/nifi).
+[https://nifi/nifi](https://nifi/nifi).
 
 NiFi handles its own authentication - log in with the single-user credentials configured in
 `deployment/base/config/configmap-env.yml`.
