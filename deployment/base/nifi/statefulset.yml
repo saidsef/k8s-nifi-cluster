@@ -41,8 +41,9 @@ spec:
           - sh
           - -c
           - |
-            chmod -R 777 /certs
+            # Only the directory: security.sh sets 600 on the key material itself.
             chown -R 1000:1000 /certs
+            chmod 750 /certs
           volumeMounts:
           - name: certs
             mountPath: /certs
@@ -58,7 +59,7 @@ spec:
                 - CHOWN
                 - FOWNER
         - name: security-setup
-          image: docker.io/apache/nifi:2.9.0
+          image: docker.io/apache/nifi:2.11.0
           command:
           - /bin/bash
           - /scripts/security.sh
@@ -71,6 +72,12 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: SERVICE_NAME
+            value: nifi
           volumeMounts:
           - name: certs
             mountPath: /certs
@@ -79,7 +86,7 @@ spec:
             subPath: security.sh
       containers:
       - name: nifi
-        image: docker.io/apache/nifi:2.9.0
+        image: docker.io/apache/nifi:2.11.0
         imagePullPolicy: IfNotPresent
         command:
           - /bin/bash

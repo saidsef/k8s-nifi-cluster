@@ -8,10 +8,11 @@ This project demonstrates how to run an Apache NiFi 2.x Cluster in Kubernetes wi
 
 - Kubernetes Cluster >= v1.23
 - `kubectl` with Kustomize support
+- An Ingress controller, see [Ingress and access](./docs/ingress.md)
 
 ## Deployments
 
-This will deploy Apache NiFi 2.9.0 in a Cluster mode using [Kubernetes Leases](https://kubernetes.io/docs/concepts/architecture/leases/) for leader election and Kubernetes ConfigMaps for state management:
+This will deploy Apache NiFi 2.11.0 in a Cluster mode using [Kubernetes Leases](https://kubernetes.io/docs/concepts/architecture/leases/) for leader election and Kubernetes ConfigMaps for state management:
 
 ```shell
 kubectl apply -k deployment/
@@ -27,29 +28,33 @@ kubectl apply -k deployment/
 
 ## Accessing the UI
 
-NiFi runs HTTPS-only. With an nginx Ingress controller, access it via the Ingress host:
+NiFi runs HTTPS-only and is reached through the Ingress. Point the host at your ingress
+controller, for example by adding `127.0.0.1 nifi` to `/etc/hosts`, then open
+[http://nifi/nifi](http://nifi/nifi).
 
-```shell
-# Add to /etc/hosts: 127.0.0.1 nifi
-kubectl port-forward svc/nifi 8443:8443 -n nifi  # fallback without ingress
-```
-
-Then open: [http://nifi/nifi](http://nifi/nifi)
-
-NiFi handles its own authentication - log in with the single-user credentials configured in `configmap.yml`.
+NiFi handles its own authentication - log in with the single-user credentials configured in
+`deployment/base/config/configmap-env.yml`.
 
 ### Default Credentials
 
 - **Username:** `admin`
 - **Password:** `Password123456`
 
-> :warning: **Important:** Change `SINGLE_USER_CREDENTIALS_PASSWORD` and `NIFI_SENSITIVE_PROPS_KEY` in `deployment/nifi/configmap.yml` before production use.
+> :warning: **Important:** Change `SINGLE_USER_CREDENTIALS_PASSWORD` and `NIFI_SENSITIVE_PROPS_KEY` in `deployment/base/config/configmap-env.yml` before production use.
+
+> :warning: `kubectl port-forward` does not reach the UI. See [why](./docs/ingress.md#why-port-forward-does-not-work).
 
 ## Verification
 
 ```shell
 kubectl get all,ing,leases -n nifi
 ```
+
+## Documentation
+
+- [Layout](./docs/layout.md) - how `deployment/` is organised, image pinning, relocating the release
+- [Ingress and access](./docs/ingress.md) - deploy targets, bringing your own controller, why port-forward fails
+- [Local testing with kind](./docs/local-testing.md) - reproduce the CI cluster locally
 
 ## Contributing
 

@@ -7,12 +7,14 @@ on:
     paths:
       - ".github/workflows/ci.yml"
       - "deployment/**"
+      - "kind-config.yml"
   pull_request:
     branches:
       - main
     paths:
       - ".github/workflows/ci.yml"
       - "deployment/**"
+      - "kind-config.yml"
   workflow_dispatch:
 
 jobs:
@@ -20,18 +22,36 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ ! contains(github.ref, 'main') }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Prepare shared certificate mount
+        run: mkdir -p /tmp/nifi-certs
+
       - name: Create k8s Kind Cluster
         uses: helm/kind-action@v1.14.0
         with:
-          kubectl_version: v1.33.7
-          node_image: kindest/node:v1.33.7
-      - name: Checkout
-        uses: actions/checkout@v7
+          kubectl_version: v1.36.1
+          config: kind-config.yml
+          cluster_name: nifi-test
+
+      - name: Validate kustomize builds
+        run: |
+          for dir in $(find deployment -name kustomization.yml -exec dirname {} \;); do
+            echo "building ${dir}"
+            kubectl kustomize "${dir}" > /dev/null
+          done
+
       - name: Run K8s test
         run: |
-          kubectl create namespace nifi
-          kubectl apply -n nifi -k deployment/
-          kubectl get all -A
+          kubectl apply -k deployment/
+          kubectl get all,ing,pvc -n nifi
+
+      - name: Diagnostics
+        if: failure()
+        run: |
+          kubectl get pods -A -o wide
+          kubectl get events -n nifi --sort-by=.lastTimestamp
 
   auto-approve:
     runs-on: ubuntu-latest
