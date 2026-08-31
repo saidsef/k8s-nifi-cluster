@@ -3,7 +3,7 @@ kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
 - role: control-plane
-  image: kindest/node:v1.36.1
+  image: kindest/node:v1.37.0
   # The ingress controller selects on this label, so it lands on the node that
   # owns the 80/443 host port mappings below.
   labels:
@@ -19,7 +19,7 @@ nodes:
   - hostPath: /tmp/nifi-certs
     containerPath: /data/nifi-certs
 - role: worker
-  image: kindest/node:v1.36.1
+  image: kindest/node:v1.37.0
   extraMounts:
   - hostPath: /tmp/nifi-certs
     containerPath: /data/nifi-certs
