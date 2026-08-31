@@ -18,9 +18,9 @@ both exist and name a running pod. No `cluster-coordinator` lease means leader e
 the Kubernetes API is not working, and the Role in `deployment/base/nifi/role.yml` is the first
 thing to check.
 
-Kubernetes readiness is not the whole story. The probe is a TCP check on the cluster protocol
-port, so a pod reports `1/1` once that port is listening, which happens before it has joined the
-cluster. For NiFi's own view, ask NiFi:
+Kubernetes readiness does not mean the node has joined. The probe is a TCP check on the cluster
+protocol port. A pod reports `1/1` once that port is listening, before it has joined the cluster.
+For NiFi's own view, ask NiFi:
 
 ```shell
 curl -s -c /tmp/cj -b /tmp/cj -X POST -H "Host: nifi" \
@@ -43,9 +43,9 @@ The cookie jar is not optional, see the JWT entry below.
 ### `400 Invalid SNI`
 
 The hostname you are calling is not in the certificate's SAN. The certificate covers `localhost`,
-`nifi`, and the service and pod names in the namespace it was generated in. Reaching NiFi under
-any other name needs that name in the SAN, which means regenerating the certificate, so delete
-the keystore from the shared volume and restart the pods.
+`nifi`, and the service and pod names in the namespace it was generated in. Reaching NiFi under any
+other name needs that name in the SAN. Regenerate the certificate by deleting the keystore from the
+shared volume and restarting the pods.
 
 ### `421 Invalid Port Requested`
 
@@ -72,15 +72,15 @@ No metrics-server in the cluster. Install it, or ignore the HPA. Nothing else de
 
 ### Stuck on `Cluster is still voting on which Flow is the correct flow`
 
-Normal for the first minute or two of a cold start, because election waits for
+Normal for the first minute or two of a cold start. Election waits for
 `NIFI_ELECTION_MAX_CANDIDATES` votes. If it does not clear, the second node never became ready.
-Check whether `nifi-1` exists at all, since `OrderedReady` will not create it until `nifi-0` is
-ready, and check `NIFI_ELECTION_MAX_CANDIDATES` against the replica count.
+Check whether `nifi-1` exists at all. `OrderedReady` will not create it until `nifi-0` is ready.
+Also check `NIFI_ELECTION_MAX_CANDIDATES` against the replica count.
 
 ### Both pods run but the cluster never forms
 
-Most likely the certificate volume is not actually shared, so each node generated its own
-keystore and neither trusts the other. Compare the fingerprints, see
+Most likely the certificate volume is not shared. Each node generated its own keystore and neither
+trusts the other. Compare the fingerprints, see
 [deploying](./deploying.md#the-shared-certificate-volume).
 
 ### Pods stay `Pending`

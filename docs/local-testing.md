@@ -11,9 +11,9 @@ kind create cluster --name nifi-test --config kind-config.yml
 
 ## Ingress controller
 
-The upstream ingress-nginx manifest carries no node selector, so pin it to the node holding the
-port mappings. Without this it can land on the worker and `http://nifi/` will not answer. It
-already tolerates the control-plane taint.
+The upstream ingress-nginx manifest carries no node selector. Pin it to the node holding the port
+mappings. Without this it can land on the worker and `http://nifi/` will not answer. It already
+tolerates the control-plane taint.
 
 ```shell
 kubectl apply -f https://kind.sigs.k8s.io/examples/ingress/deploy-ingress-nginx.yaml
@@ -30,7 +30,7 @@ kubectl rollout status statefulset/nifi -n nifi --timeout=900s
 ```
 
 `podManagementPolicy: OrderedReady` starts `nifi-1` only once `nifi-0` is ready, and flow election
-needs both votes, so first start takes a few minutes. Confirm the cluster formed:
+needs both votes. First start takes a few minutes. Confirm the cluster formed:
 
 ```shell
 curl -s -c /tmp/cj -b /tmp/cj -X POST -H "Host: nifi" \

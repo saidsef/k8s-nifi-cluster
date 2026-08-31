@@ -19,10 +19,10 @@ The keystore password is written out in two files, twice in `configmap-security.
 that points NiFi at the certificates. Change all five or NiFi will not open its own keystore.
 
 Change `NIFI_SENSITIVE_PROPS_KEY` before you build a flow, not after. It encrypts sensitive
-properties already stored in the flow, so changing it later leaves NiFi unable to decrypt them.
+properties stored in the flow. Changing it later leaves NiFi unable to decrypt them.
 
-None of these are Secrets. They are ConfigMap values in a public repo, so treat this as a
-starting point and move them into whatever secret management you already run.
+None of these are Secrets. They are ConfigMap values in a public repo. Treat this as a starting
+point and move them into whatever secret management you run.
 
 ## Settings
 
@@ -49,8 +49,8 @@ a different controller in front and you have to add its host and port, or you ge
 `421 Invalid Port Requested`. See [operations](./operations.md).
 
 `NIFI_ELECTION_MAX_CANDIDATES` should match the StatefulSet replica count. Set it higher than the
-number of nodes that will actually start and every deploy waits the full `NIFI_ELECTION_MAX_WAIT`
-before forming.
+number of nodes that will start and every deploy waits the full `NIFI_ELECTION_MAX_WAIT` before
+forming.
 
 `NIFI_JVM_HEAP_MAX` is 2g against a 4Gi container limit. Raise the heap and raise the limit with
 it, or the JVM gets killed by the kernel rather than throwing `OutOfMemoryError`.
@@ -61,7 +61,7 @@ it, or the JVM gets killed by the kernel rather than throwing `OutOfMemoryError`
 the other, or the HPA will immediately scale the StatefulSet back to its own minimum.
 
 Raising the replica count means raising `NIFI_ELECTION_MAX_CANDIDATES` to match, and it means the
-certificate volume has to be genuinely shared across every node the pods can land on. See
+certificate volume has to be shared across every node the pods can land on. See
 [deploying](./deploying.md#the-shared-certificate-volume).
 
 ## Other files

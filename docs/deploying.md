@@ -16,16 +16,15 @@ Without metrics-server the HPA sits at `<unknown>` targets and never scales. Not
 
 Read this before deploying to a real cluster.
 
-Both pods serve the same certificate. The `security-setup` init container generates a keystore
-into the shared volume on first start, exports the certificate, imports it into a truststore, and
-every later pod finds the keystore already there and reuses it. The truststore holds exactly one
-entry, that one certificate, which is how the nodes authenticate each other on the cluster
-protocol port.
+Both pods serve the same certificate. The `security-setup` init container generates a keystore into
+the shared volume on first start, exports the certificate, imports it into a truststore, and every
+later pod reuses the keystore it finds. The truststore holds exactly one entry, that one
+certificate, which is how the nodes authenticate each other on the cluster protocol port.
 
-`persistentvolume-certs.yml` backs that volume with a `hostPath` at `/data/nifi-certs`. hostPath
-is node-local. Put two pods on two nodes and they see two different directories, each generates
-its own keystore, and neither trusts the other's certificate, so the cluster protocol handshake
-fails and the cluster never forms.
+`persistentvolume-certs.yml` backs that volume with a `hostPath` at `/data/nifi-certs`. hostPath is
+node-local. Put two pods on two nodes and they see two different directories, each generates its
+own keystore, and neither trusts the other's certificate. The cluster protocol handshake fails and
+the cluster never forms.
 
 The kind config in this repo works around it by mounting one host directory into every node. That
 is fine for testing and is not a pattern to copy onto a real cluster. There, either:
@@ -34,7 +33,7 @@ is fine for testing and is not a pattern to copy onto a real cluster. There, eit
   `persistentvolume-certs.yml`, letting the class provision the volume, or
 - pin the pods to a single node with a node selector, accepting that you lose the second node.
 
-You can confirm the volume is genuinely shared by comparing the certificate each pod loaded:
+Confirm the volume is shared by comparing the certificate each pod loaded:
 
 ```shell
 for p in nifi-0 nifi-1; do
@@ -59,12 +58,12 @@ See [ingress and access](./ingress.md) for the other deploy targets, and
 ## What the first start looks like
 
 Allow a few minutes. `podManagementPolicy: OrderedReady` holds `nifi-1` back until `nifi-0` is
-ready, and `nifi-0` has a 60 second readiness delay before its first probe, so the second node
-does not even begin until well over a minute in. NiFi itself starts in around 30 seconds once the
-image is pulled.
+ready, and `nifi-0` has a 60 second readiness delay before its first probe. The second node does
+not begin until well over a minute in. NiFi itself starts in around 30 seconds once the image is
+pulled.
 
-Flow election then needs both votes, because `NIFI_ELECTION_MAX_CANDIDATES` is 2. Until the second
-node casts its vote the first one logs this on a loop, and it is not a fault:
+Flow election needs both votes. `NIFI_ELECTION_MAX_CANDIDATES` is 2. Until the second node casts
+its vote the first one logs this on a loop, and it is not a fault:
 
 ```text
 Requested by cluster coordinator to retry connection in 5 seconds with explanation:
