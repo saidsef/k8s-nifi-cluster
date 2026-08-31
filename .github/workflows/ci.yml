@@ -27,6 +27,10 @@ jobs:
           node_image: kindest/node:v1.33.7
       - name: Checkout
         uses: actions/checkout@v7
+      - name: Validate kustomize builds
+        run: |
+          kubectl kustomize deployment/base > /dev/null
+          kubectl kustomize deployment/     > /dev/null
       - name: Run K8s test
         run: |
           kubectl create namespace nifi
