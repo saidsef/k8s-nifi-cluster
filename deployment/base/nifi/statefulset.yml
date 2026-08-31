@@ -58,7 +58,7 @@ spec:
                 - CHOWN
                 - FOWNER
         - name: security-setup
-          image: docker.io/apache/nifi:2.9.0
+          image: docker.io/apache/nifi:2.11.0
           command:
           - /bin/bash
           - /scripts/security.sh
@@ -79,7 +79,7 @@ spec:
             subPath: security.sh
       containers:
       - name: nifi
-        image: docker.io/apache/nifi:2.9.0
+        image: docker.io/apache/nifi:2.11.0
         imagePullPolicy: IfNotPresent
         command:
           - /bin/bash
