@@ -41,27 +41,27 @@ point and move them into whatever secret management you run.
 | `NIFI_ELECTION_MAX_CANDIDATES` | votes needed to end flow election early |
 | `SINGLE_USER_CREDENTIALS_USERNAME`, `SINGLE_USER_CREDENTIALS_PASSWORD` | the single user NiFi authenticates |
 
-## Settings that have to agree
+## Settings that must agree
 
-`NIFI_WEB_PROXY_HOST` has to contain whatever Host header reaches NiFi. The nginx Ingress
-rewrites it to `nifi:8443` with `upstream-vhost`, which is why that one value is enough here. Put
-a different controller in front and you have to add its host and port, or you get
-`421 Invalid Port Requested`. See [operations](./operations.md).
+`NIFI_WEB_PROXY_HOST` must contain whatever Host header reaches NiFi. The nginx Ingress rewrites it
+to `nifi:8443` with `upstream-vhost`, which is why that one value is enough here. If you put a
+different controller in front, you must add its host and port, otherwise NiFi returns `421 Invalid
+Port Requested`. See [operations](./operations.md).
 
 `NIFI_ELECTION_MAX_CANDIDATES` should match the StatefulSet replica count. Set it higher than the
 number of nodes that will start and every deploy waits the full `NIFI_ELECTION_MAX_WAIT` before
 forming.
 
-`NIFI_JVM_HEAP_MAX` is 2g against a 4Gi container limit. Raise the heap and raise the limit with
-it, or the JVM gets killed by the kernel rather than throwing `OutOfMemoryError`.
+`NIFI_JVM_HEAP_MAX` is 2g against a 4Gi container limit. If you raise the heap, raise the limit
+with it. Otherwise the kernel kills the JVM before it can throw `OutOfMemoryError`.
 
 ## Scaling
 
 `replicas` in `statefulset.yml` and `minReplicas` in `hpa.yml` are both 2. Change one and change
-the other, or the HPA will immediately scale the StatefulSet back to its own minimum.
+the other. Otherwise the HPA scales the StatefulSet back to its own minimum.
 
 Raising the replica count means raising `NIFI_ELECTION_MAX_CANDIDATES` to match, and it means the
-certificate volume has to be shared across every node the pods can land on. See
+certificate volume must be shared across every node the pods can land on. See
 [deploying](./deploying.md#the-shared-certificate-volume).
 
 ## Other files

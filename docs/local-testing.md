@@ -1,6 +1,6 @@
 # Local testing with kind
 
-`kind-config.yml` builds the same two node cluster CI uses. It maps ports 80 and 443 on the
+`kind-config.yml` builds the same two-node cluster used by CI. It maps ports 80 and 443 on the
 control-plane node, labels that node `ingress-ready=true`, and mounts `/tmp/nifi-certs` into both
 nodes so the shared certificate volume is visible cluster-wide.
 
@@ -50,8 +50,7 @@ Expect `"connectedNodes":"2 / 2"`. The cookie jar matters, see
 The HPA needs `metrics-server`, which kind does not ship. Install it with `--kubelet-insecure-tls`
 if you want to exercise scaling, otherwise the HPA reports `<unknown>` targets.
 
-If it does not come up, [operations](./operations.md#when-something-is-wrong) lists what the
-errors mean.
+If it does not come up, [operations](./operations.md#common-failures) lists what the errors mean.
 
 ## Teardown
 

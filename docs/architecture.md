@@ -15,9 +15,9 @@ Kubernetes API rather than ZooKeeper, share one certificate, and are reached thr
 
 ## Reaching the UI
 
-The Ingress is the only route in. NiFi binds its HTTPS connector to the pod's fully qualified
-name, not to all addresses. Nothing listens on the loopback address `kubectl port-forward`
-connects to. See [ingress and access](./ingress.md).
+The Ingress is the only route to the UI. NiFi binds its HTTPS connector to the pod's fully
+qualified name, not to all addresses. Nothing listens on the loopback address that
+`kubectl port-forward` connects to. See [ingress and access](./ingress.md).
 
 The nginx Ingress carries four settings. Another controller needs their equivalents.
 
@@ -28,10 +28,10 @@ The nginx Ingress carries four settings. Another controller needs their equivale
 | Host rewritten to `nifi:8443` | `NIFI_WEB_PROXY_HOST` allows that one value, anything else gives `421 Invalid Port Requested` |
 | sticky sessions by cookie | each node signs its own JWTs and rejects the other's |
 
-Rewriting the Host keeps the allowlist to a single entry whatever name you reach the cluster
-under.
+Rewriting the Host keeps the allowlist to a single entry, whatever name is used to reach the
+cluster.
 
-## Forming a cluster
+## Cluster formation
 
 `KubernetesLeaderElectionManager` elects two roles through Leases. The cluster coordinator admits
 nodes and holds the authoritative view of membership. The primary node runs isolated processors.
@@ -64,15 +64,15 @@ The certificate's SAN covers:
 
 Any other hostname gives `400 Invalid SNI`.
 
-The volume has to be ReadWriteMany. Two pods on two nodes backed by node-local storage each
-generate their own keystore. Neither trusts the other and the cluster never forms. See
+The volume must be ReadWriteMany. Two pods on two nodes backed by node-local storage each generate
+their own keystore. Neither trusts the other and the cluster never forms. See
 [deploying](./deploying.md#the-shared-certificate-volume).
 
 User authentication is separate. One username and password come from the ConfigMap, authorised by
 `SingleUserAuthorizer`. The main container deletes `users.xml` and `authorizations.xml` on every
 start. Those credentials always apply.
 
-## What is kept
+## Persistence
 
 | Data | Where it lives | Survives losing the pod |
 | --- | --- | --- |
@@ -85,10 +85,10 @@ start. Those credentials always apply.
 A rolling restart is safe. The surviving node replicates the flow back to the one that comes up.
 Losing both pods at once loses the flow. See [layout](./layout.md#what-is-not-persisted).
 
-## Starting up
+## Start-up sequence
 
 1. `fix-permissions` takes ownership of the certificate directory as root.
-2. `security-setup` generates the keystore, or finds one and leaves it.
+2. `security-setup` generates the keystore, or leaves the existing one in place.
 3. The main container rewrites `nifi.properties` for the shared certificate paths, disables the
    SNI host check and clears the user files.
 4. `start.sh` brings NiFi up.
@@ -97,7 +97,7 @@ Losing both pods at once loses the flow. See [layout](./layout.md#what-is-not-pe
 `nifi-1` back until then, and a first start takes several minutes.
 
 Readiness only checks that the port is open. A pod reads `1/1` before it has joined the cluster.
-Ask NiFi for membership, see [operations](./operations.md#is-it-healthy).
+For membership, query the NiFi API, see [operations](./operations.md#health-checks).
 
 The single user password, the sensitive properties key and the keystore password ship as
 placeholders. Change them before production, see

@@ -1,6 +1,6 @@
 # Ingress and access
 
-The Ingress is kept out of the base so you can bring your own controller.
+The Ingress is kept out of the base, allowing you to supply your own controller.
 
 | Command | Deploys |
 | --- | --- |
@@ -39,13 +39,13 @@ self-signed. Your controller needs the equivalent of the settings in
 | upstream host `nifi:8443` | must match an entry in `NIFI_WEB_PROXY_HOST` |
 | sticky sessions | each node signs its own JWTs and rejects the other's |
 
-Sticky sessions are not an optimisation. A token issued by one node is rejected by the other with
-`Signed JWT rejected: Another algorithm expected, or no matching key(s) found`.
+Sticky sessions are required. A token issued by one node is rejected by the other with `Signed JWT
+rejected: Another algorithm expected, or no matching key(s) found`.
 
-Two failures are worth knowing before you start. Neither error says what it means. A `host:port`
-NiFi has not been told about gives `421 Invalid Port Requested`, and a hostname outside the
-certificate's SAN gives `400 Invalid SNI`. Both are covered in
-[operations](./operations.md#when-something-is-wrong), and the allowlist that drives the first is
+Two failures are worth knowing about before you start. Neither error message describes the
+underlying problem. A `host:port` NiFi has not been told about gives `421 Invalid Port Requested`,
+and a hostname outside the certificate's SAN gives `400 Invalid SNI`. Both are covered in
+[operations](./operations.md#common-failures), and the allowlist that drives the first is
 `NIFI_WEB_PROXY_HOST` in [configuration](./configuration.md).
 
 ## Why port-forward does not work

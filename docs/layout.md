@@ -10,14 +10,14 @@ deployment/
 └── nginx/              # base + an nginx Ingress
 ```
 
-Every folder carries its own `kustomization.yml`, so each can be built on its own:
+Each folder carries its own `kustomization.yml` and can be built independently:
 
 ```shell
 kubectl kustomize deployment/base/config
 ```
 
-`base/` is the whole of NiFi with no Ingress attached. `nginx/` layers an nginx Ingress on top of
-it. `deployment/kustomization.yml` is a thin default that points at `nginx/`.
+`base/` contains NiFi with no Ingress. `nginx/` layers an nginx Ingress on top of it.
+`deployment/kustomization.yml` is a default that points at `nginx/`.
 
 ## Image tags
 

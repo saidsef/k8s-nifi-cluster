@@ -1,8 +1,10 @@
 # Kubernetes NiFi Cluster
 
-[Apache NiFi](https://nifi.apache.org/) supports powerful and scalable directed graphs of data routing, transformation, and system mediation logic.
+[Apache NiFi](https://nifi.apache.org/) routes, transforms and mediates data between systems using
+directed graphs.
 
-This project demonstrates how to run an Apache NiFi 2.x Cluster in Kubernetes with secure defaults and Kubernetes-native coordination.
+This project runs an Apache NiFi 2.x cluster on Kubernetes, coordinated through the Kubernetes API
+and served over HTTPS.
 
 ## Prerequisites
 
@@ -11,8 +13,9 @@ This project demonstrates how to run an Apache NiFi 2.x Cluster in Kubernetes wi
 - An Ingress controller, see [Ingress and access](./docs/ingress.md)
 - ReadWriteMany storage for the shared certificate volume, see [Deploying](./docs/deploying.md#the-shared-certificate-volume)
 
-New to this? [Local testing with kind](./docs/local-testing.md) gets you a working cluster in one
-page. Read [Deploying](./docs/deploying.md) before putting it on a real one.
+For a first deployment, [local testing with kind](./docs/local-testing.md) produces a working
+cluster in a single page. Read [deploying](./docs/deploying.md) before deploying to a production
+cluster.
 
 ## Deployments
 
@@ -58,11 +61,11 @@ kubectl get all,ing,leases -n nifi
 
 Full index in [docs/](./docs/README.md).
 
-- [Architecture](./docs/architecture.md) - how the pieces fit together, with a diagram
-- [Deploying](./docs/deploying.md) - what your cluster needs, and what the first start looks like
-- [Ingress and access](./docs/ingress.md) - deploy targets, bringing your own controller, why port-forward fails
+- [Architecture](./docs/architecture.md) - how the components fit together, with a diagram
+- [Deploying](./docs/deploying.md) - cluster requirements, and what the first start looks like
+- [Ingress and access](./docs/ingress.md) - deploy targets, supplying your own controller, why port-forward fails
 - [Configuration](./docs/configuration.md) - every ConfigMap setting, and what to change before production
-- [Operations](./docs/operations.md) - health checks, and what the errors mean
+- [Operations](./docs/operations.md) - health checks, and what the common failures mean
 - [Layout](./docs/layout.md) - how `deployment/` is organised, image pinning, relocating the release
 - [Local testing with kind](./docs/local-testing.md) - reproduce the CI cluster locally
 

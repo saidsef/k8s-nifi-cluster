@@ -1,6 +1,6 @@
 # Deploying
 
-## What your cluster needs
+## Requirements
 
 | Requirement | Detail |
 | --- | --- |
@@ -26,8 +26,8 @@ node-local. Put two pods on two nodes and they see two different directories, ea
 own keystore, and neither trusts the other's certificate. The cluster protocol handshake fails and
 the cluster never forms.
 
-The kind config in this repo works around it by mounting one host directory into every node. That
-is fine for testing and is not a pattern to copy onto a real cluster. There, either:
+The kind config in this repo works around it by mounting one host directory into every node. This
+is acceptable for testing but should not be copied onto a production cluster. Instead, either:
 
 - point the claim at a real ReadWriteMany class - NFS, EFS, Azure Files, CephFS - and delete
   `persistentvolume-certs.yml`, letting the class provision the volume, or
@@ -55,7 +55,7 @@ kubectl rollout status statefulset/nifi -n nifi --timeout=900s
 See [ingress and access](./ingress.md) for the other deploy targets, and
 [configuration](./configuration.md) for what to change first.
 
-## What the first start looks like
+## The first start
 
 Allow a few minutes. `podManagementPolicy: OrderedReady` holds `nifi-1` back until `nifi-0` is
 ready, and `nifi-0` has a 60 second readiness delay before its first probe. The second node does
@@ -63,7 +63,7 @@ not begin until well over a minute in. NiFi itself starts in around 30 seconds o
 pulled.
 
 Flow election needs both votes. `NIFI_ELECTION_MAX_CANDIDATES` is 2. Until the second node casts
-its vote the first one logs this on a loop, and it is not a fault:
+its vote, the first logs the following on a loop. This is not a fault:
 
 ```text
 Requested by cluster coordinator to retry connection in 5 seconds with explanation:
