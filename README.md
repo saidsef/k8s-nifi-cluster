@@ -58,6 +58,7 @@ kubectl get all,ing,leases -n nifi
 
 Full index in [docs/](./docs/README.md).
 
+- [Architecture](./docs/architecture.md) - how the pieces fit together, with a diagram
 - [Deploying](./docs/deploying.md) - what your cluster needs, and what the first start looks like
 - [Ingress and access](./docs/ingress.md) - deploy targets, bringing your own controller, why port-forward fails
 - [Configuration](./docs/configuration.md) - every ConfigMap setting, and what to change before production

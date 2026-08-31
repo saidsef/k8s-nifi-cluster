@@ -1,5 +1,9 @@
 # Documentation
 
+How it works:
+
+- [Architecture](./architecture.md) - how the pieces fit together, with a diagram
+
 Standing it up:
 
 - [Deploying](./deploying.md) - what your cluster needs before you apply anything, and what the first start looks like
