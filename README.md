@@ -1,10 +1,17 @@
 # Kubernetes NiFi Cluster
 
+[![CI](https://github.com/saidsef/k8s-nifi-cluster/actions/workflows/ci.yml/badge.svg)](https://github.com/saidsef/k8s-nifi-cluster/actions/workflows/ci.yml)
+[![Documentation](https://readthedocs.org/projects/k8s-nifi-cluster/badge/?version=latest)](https://k8s-nifi-cluster.readthedocs.io/en/latest/)
+![GitHub issues](https://img.shields.io/github/issues/saidsef/k8s-nifi-cluster)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/saidsef/k8s-nifi-cluster)
+
 [Apache NiFi](https://nifi.apache.org/) routes, transforms and mediates data between systems using
 directed graphs.
 
 This project runs an Apache NiFi 2.x cluster on Kubernetes, coordinated through the Kubernetes API
 and served over HTTPS.
+
+Full documentation: [k8s-nifi-cluster.readthedocs.io](https://k8s-nifi-cluster.readthedocs.io/).
 
 ## Prerequisites
 
@@ -59,7 +66,8 @@ kubectl get all,ing,leases -n nifi
 
 ## Documentation
 
-Full index in [docs/](./docs/README.md).
+Published at [k8s-nifi-cluster.readthedocs.io](https://k8s-nifi-cluster.readthedocs.io/), with the
+source in [docs/](./docs/README.md).
 
 - [Architecture](./docs/architecture.md) - how the components fit together, with a diagram
 - [Deploying](./docs/deploying.md) - cluster requirements, and what the first start looks like
