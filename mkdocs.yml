@@ -1,0 +1,35 @@
+site_name: k8s-nifi-cluster
+repo_url: https://github.com/saidsef/k8s-nifi-cluster
+strict: true
+theme:
+  name: material
+  palette:
+    primary: teal
+  features:
+  - content.code.copy
+  - content.tabs.link
+markdown_extensions:
+- codehilite
+- admonition
+- tables
+- toc:
+    permalink: true
+    toc_depth: 3
+- pymdownx.tabbed:
+    alternate_style: true
+- pymdownx.superfences:
+    custom_fences:
+    - name: mermaid
+      class: mermaid
+      format: !!python/name:pymdownx.superfences.fence_code_format
+nav:
+  - Overview: README.md
+  - Architecture: architecture.md
+  - Deployment:
+    - Deploying: deploying.md
+    - Ingress and access: ingress.md
+    - Configuration: configuration.md
+  - Operation:
+    - Operations: operations.md
+    - Layout: layout.md
+    - Local testing with kind: local-testing.md
